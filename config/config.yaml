@@ -1,0 +1,47 @@
+general:
+  instance_name: UB RA Web Form
+  project_domains:
+    - EV
+    - Semicondictor Manufacturing
+  users:
+    - admin
+    - analyst_user
+  roles:
+    - admin:
+      - admin
+    - viewer:
+      - analyst_user
+  legacy_dashboard_password: '123'
+  legacy_flask_app_secret_key: SECRET_KEY
+  websafe_session_id_size: 8
+datastore:
+  #datastore_type: local
+  #datastore_file_name: datastore.parquet
+  #deletion_behavior: archive
+  datastore_type: mysql
+  datastore_params:
+    mysql_username: root
+    mysql_password: password
+    mysql_hostname: 127.0.0.1
+    mysql_database: webformdata
+    mysql_sqlalchemy_engine_options:
+      SQLALCHEMY_POOL_RECYCLE: 299
+      SQLALCHEMY_TRACK_MODIFICATIONS: False
+  data_upload:
+    data_upload_folder: upload
+    allowed_formats: 
+      - csv
+      - xlsx
+form:
+  form_type: dynamic
+  form_config_folder: form_config
+  form_config_file_name: form.xlsx
+email:
+  sender_address: UB RA Web Form Admin <mailgun@sandboxf7cf6f2359994397ab1b7a150ce5c6fa.mailgun.org>
+  provider:
+    provider_name: mailgun
+    service_protocol: http
+    http_service_api_url: https://api.mailgun.net/v3/sandboxf7cf6f2359994397ab1b7a150ce5c6fa.mailgun.org/messages
+    api_key: 98420c6821f675a1c83d5de491df6ced-9c3f0c68-678b2533
+advanced_analytics:
+  # form_validations: list: ['sessiondata','L1','L2','L3']

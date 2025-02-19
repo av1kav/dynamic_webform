@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/styles.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <div class="container">
+        <div class="text-left mt-5 mb-4">
+            <h1>Dashboard</h1>
+            <p class="text-muted">Dashboard for basic analytics and viewing submissions.</p>
+        </div>
+    </div>
+    <div class="container my-5">
+        <h2>Submission History</h2>
+        <div class="d-flex justify-content-end">
+            <button onclick="downloadFile('excel')" title="Download as Excel" class="btn btn-light rounded-0"><i class="bi bi-filetype-xls"></i></button>
+            <button onclick="downloadFile('parquet')" title="Download as Parquet" class="btn btn-light rounded-0"><i class="bi bi-file-zip"></i></button>
+            <button onclick="downloadFile('json')" title="Download as JSON" class="btn btn-light rounded-0"><i class="bi bi-filetype-json"></i></button>
+        </div>
+        <div class="table-container mb-5 p-3 bg-light rounded" style="overflow-x: scroll;">
+            <!-- Form submission table --> 
+            {{ form_submissions | safe }}
+        </div>
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-secondary" href="{{ url_for('upload_file') }}" title="Upload data">Upload Data</a>
+        </div>
+        <a class="btn btn-primary" href="{{ url_for('form') }}" title="Back">Back</a>
+        <a class="btn btn-secondary" href="{{ url_for('logout') }}" title="Logout">Logout</a>
+    </div>
+    <!-- Footer -->
+    <footer class="footer mt-5 py-4 bg-royal-blue text-white">
+        <div class="container text-center">
+            <div class="row">
+                <!-- Footer Links -->
+                <div class="col-md-4 mb-3">
+                    <a href="https://management.buffalo.edu/">
+                        <img src="https://management.buffalo.edu/content/dam/mgt/Shared-Images/logo-white.png" alt="School of Management, University at Buffalo" style="width: 300px;"/>
+                    </a>
+                    <br>
+                </div>
+
+                <!-- Footer Disclaimers -->
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold">Disclaimer</h6>
+                    <p class="small">This website collects session information. Use of this site is subject to UB's <a class="text-white" href="//www.buffalo.edu/administrative-services/policy1/ub-policy-lib/privacy.html">Privacy Policy</a>.</p>
+                </div>
+
+                <!-- Footer Contact Info -->
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold">Contact Us</h6>
+                    <p class="small">
+                        <i class="bi bi-envelope text-white"></i><a class="text-white" href="mailto:ubsomrf1@outlook.com"> UB SOM Research Team</a><br>
+                        <i class="bi bi-geo-alt"></i> 160 Jacobs Management Center <br> Buffalo, NY 14260-4000
+                    </p>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="row">
+                <div class="col-12 mt-3">
+                    <p class="small mb-0">&copy; 2024 <a class="text-white" href="//www.buffalo.edu/">University at Buffalo.</a> All rights reserved. | <a class="text-white" href="//www.buffalo.edu/administrative-services/policy1/ub-policy-lib/privacy.html">Privacy</a>  |  <a class="text-white" href="//www.buffalo.edu/access/about-us/contact-us.html">Accessibility</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
+</body>
+</html>

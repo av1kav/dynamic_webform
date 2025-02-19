@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Information Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/styles.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+</head>
+<body>
+<div class="container" role="main">
+    <!-- Screen Reader-only div for messages/info/alerts from Session ID container -->
+    <div id="session-id-container-messages" class="sr-only" aria-live="polite"></div>
+    <!-- Title Graphics and Text -->
+    <div class="title-content text-center mt-5 mb-4">
+        <img src="{{ url_for('static',filename='icons/105_ub_primary.png') }}" alt="University at Buffalo The State University of New York" style="width: 300px;">
+        <h1 class="mt-3">Business Information Form</h1>
+        <p class="text-muted">Please fill out the form below as accurately as possible. You can always submit the form and resume at a later time by noting down the generated Session ID and pasting it into the Resume Session box when ready.</p>
+    </div>
+    <!-- Session ID Info Container -->
+    <div class="d-flex flex-wrap session-info-container justify-content-around" role="complementary">
+        <div class="px-0">
+            <!-- Generated Session ID Copy Field -->
+            <div class="input-group mb-3">
+                <label for="session_id_generated" class="input-group-text">Session ID:</label>
+                <input type="text" id="session_id_generated" class="form-control silent" readonly value="{{ session_id }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary input-group-button-append" id="copyButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Copied" onclick="copySessionID()"><i class="bi bi-copy"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="px-0">
+            <!-- Session ID Load Field -->
+            <div class="input-group mb-3">
+                <label for="target_session_id" class="input-group-text">Resume Session:</label>
+                <input type="text" id="target_session_id" class="form-control">
+                <div class="input-group-append">
+                    <button class="btn btn-primary input-group-button-append" onclick="loadFormData()" aria-label="Resume Session" title="Resume Session"><i class="bi bi-cloud-arrow-down"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Form Container -->
+    <div class="form-container">
+        <!-- Progress Bar -->
+        <div class="progress form-progress">
+            <div class="progress-bar bg-royal-blue" role="progressbar" aria-label="Form Progress" id="progress-bar"></div>
+        </div>
+        <!-- Additional Links-->
+        <div class="icon-box">
+            <div><a href="{{ url_for('dashboard') }}" class="btn nav-btn-royal-blue rounded-circle  my-1" title="Dashboard"><i class="bi bi-bar-chart-fill"></i></a></div>
+            <div><a href="{{ url_for('view_docs') }}" class="btn nav-btn-royal-blue rounded-circle  my-1" title="Documentation"><i class="bi bi-file-earmark-text-fill"></i></a></div>
+            <div><a href="mailto:ubsomrf1@outlook.com?subject=Bug Report" class="btn nav-btn-royal-blue rounded-circle  my-1" title="Report a Problem"><i class="bi bi-bug-fill"></i></a></div>
+        </div>
+        <!-- Inner Form Container -->
+        <div class="inner-form-container">
+            <form id="info-multistep" action="{{ url_for('submit') }}" method="post" autocomplete="on">
+                <!-- Section: General Information -->
+                <div class="form-page" id="page1">
+                    <h4 class="mt-4" aria-level="2">General Information</h4>
+                    <p class="text-muted">Please fill out your contact information below.</p>
+                    <div class="mb-3">
+                        <label for="applicant_name" class="form-label required-field">Applicant Name</label>
+                        <input type="text" class="form-control" id="applicant_name" name="applicant_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title_function" class="form-label">Title / Function</label>
+                        <input type="text" class="form-control" id="title_function" name="title_function" >
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="region" class="form-label">Region</label>
+                            <select class="form-select" id="region" name="region" >
+                                <option value="Buffalo">Buffalo</option>
+                                <option value="Rochester">Rochester</option>
+                                <option value="Syracuse">Syracuse</option>
+                                <option value="Binghamton">Binghamton</option>
+                                <option value="Corning">Corning</option>
+                                <option value="Jamestown">Jamestown</option>
+                                <option value="Ithaca">Ithaca</option>
+                                <option value="Wellsville">Wellsville</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="county" class="form-label">County</label>
+                            <input type="text" class="form-control" id="county" name="county" >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <select class="form-select" id="state" name="state" >
+                                <option value="NY">NY</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Applicant Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope-at"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="website_address" class="form-label">Website Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                            <input type="url" class="form-control" id="website_address" name="website_address" placeholder="Full address e.g. https://www.example.com"   pattern="http(s)?://www.+">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business_phone" class="form-label">Business Phone</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input type="tel" class="form-control" id="business_phone" name="business_phone" >
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business_address" class="form-label">Business Street Address, City, ST, Zip</label>
+                        <input type="text" class="form-control" id="business_address" name="business_address" >
+                    </div>
+                </div>
+                <!-- Section: Company Information -->
+                <div class="form-page d-none" id="page2">
+                    <h4 class="mt-4" aria-level="2">Company Information</h4>
+                    <p class="text-muted">Please enter information about the company on behalf of which the application is being submitted for.</p>
+                    <div class="mb-3">
+                        <label for="company_name" class="form-label required-field">Company Name</label>
+                        <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Please enter the full name." required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="parent_company" class="form-label">Parent Company Name, if any</label>
+                        <input type="text" class="form-control" id="parent_company" name="parent_company">
+                    </div>
+                    <div class="mb-3">
+                        <label for="founder_ceo_name" class="form-label">Founder's / CEO's Name</label>
+                        <input type="text" class="form-control" id="founder_ceo_name" name="founder_ceo_name" placeholder="Please enter the full name." >
+                    </div>
+                    <div class="mb-3">
+                        <label for="company_description" class="form-label">Company Description</label>
+                        <textarea class="form-control" id="company_description" name="company_description" rows="3" onpaste="return false;" ondrop="return false;" autocomplete="off"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="founded_established_year" class="form-label">Founded/Established Year</label>
+                            <input type="date" class="form-control" id="founded_established_year" name="founded_established_year">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lifetime_sales_revenue" class="form-label">Lifetime Sales Revenue</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" id="lifetime_sales_revenue" name="lifetime_sales_revenue">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sector" class="form-label">Sector</label>
+                            <select class="form-select" id="sector" name="sector" >
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Energy">Energy</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="legal_structure" class="form-label">Legal Structure</label>
+                            <select class="form-select" id="legal_structure" name="legal_structure" >
+                                <option value="Public Corporation">Public Corporation</option>
+                                <option value="Limited Liability Company (LLC)">Limited Liability Company (LLC)</option>
+                                <option value="Sole Proprietorship">Sole Proprietorship</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Cooperative">Cooperative</option>
+                                <option value="Nonprofit">Nonprofit</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="entity_type" class="form-label">Entity Type</label>
+                            <select class="form-select" id="entity_type" name="entity_type" >
+                                <option value="Headquarters">Headquarters</option>
+                                <option value="Subsidiary">Subsidiary</option>
+                                <option value="Division">Division</option>
+                                <option value="Branch">Branch</option>
+                                <option value="Franchise">Franchise</option>
+                                <option value="Branch">Branch</option>
+                                <option value="Joint Venture">Joint Venture</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" >
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Merged">Merged</option>
+                                <option value="Acquired">Acquired</option>
+                                <option value="Bankrupt">Bankrupt</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="business_engagement_model" class="form-label">Business Engagement Model</label>
+                            <select class="form-select" id="business_engagement_model" name="business_engagement_model" >
+                                <option value="B2B">B2B</option>
+                                <option value="B2C">B2C</option>
+                                <option value="B2G">B2G</option>
+                                <option value="G2B">G2B</option>
+                                <option value="G2C">G2C</option>
+                                <option value="Collaborative Projects">Collaborative Projects</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="facility_type" class="form-label">Facility Type</label>
+                            <select class="form-select" id="facility_type" name="facility_type" >
+                                <option value="Manufacturing Plant">Manufacturing Plant</option>
+                                <option value="Research and Development Center">Research and Development Center</option>
+                                <option value="Warehouse/Distribution Center">Warehouse/Distribution Center</option>
+                                <option value="Corporate Office">Corporate Office</option>
+                                <option value="Sales Office">Sales Office</option>
+                                <option value="Marketing Office">Marketing Office</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="trade_type" class="form-label">Trade Type</label>
+                            <select class="form-select" id="trade_type" name="trade_type" >
+                                <option value="Import">Import</option>
+                                <option value="Export">Export</option>
+                                <option value="Both Import and Export">Both Import and Export</option>
+                                <option value="Wholesaler">Wholesaler</option>
+                                <option value="Distributor">Distributor</option>
+                                <option value="Retailer">Retailer</option>
+                                <option value="Supplier">Supplier</option>
+                                <option value="Logistics Provider">Logistics Provider</option>
+                                <option value="E-commerce Platform Sales">E-commerce Platform Sales</option>
+                                <option value="Subcontracting/Co-manufacturing">Subcontracting/Co-manufacturing</option>
+                                <option value="Processed Raw Material Supplier">Processed Raw Material Supplier</option>
+                                <option value="Component Supplier">Component Supplier</option>
+                                <option value="Equipment Supplier">Equipment Supplier</option>
+                                <option value="Packaging Supplier">Packaging Supplier</option>
+                                <option value="Services Provider">Services Provider</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col md-6 mb-3">
+                            <label for="minority_owned" class="form-label">Is the company minority-owned?</label>
+                            <select class="form-select" id="minority_owned" name="minority_owned">
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="company_website" class="form-label">Company Website</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                            <input type="text" class="form-control" id="company_website" name="company_website" placeholder="Full address e.g. https://www.example.com">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="executive_contact_name" class="form-label">Please name an Executive at your company who can be contacted</label>
+                        <input type="text" class="form-control" id="executive_contact_name" name="executive_contact_name" placeholder="Please enter the full name.">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="executive_contact_designation" class="form-label">Executive's Designation</label>
+                            <input type="text" class="form-control" id="executive_contact_designation" name="executive_contact_designation" placeholder="e.g. VP, Regional Sales" >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="executive_contact_number" class="form-label">Executive's Contact Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" class="form-control" id="executive_contact_number" name="executive_contact_number" >
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="executive_contact_email" class="form-label">Executive's Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-at"></i></span>
+                                <input type="email" class="form-control" id="executive_contact_email" name="executive_contact_email" placeholder="email@example.com">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="company_type" class="form-label">Company Type</label>
+                            <select class="form-select" id="company_type" name="company_type" >
+                                <option value="Private">Private</option>
+                                <option value="Public">Public</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="primary_markets" class="form-label">What Industries / Markets does your company primarily serve?</label>
+                        <textarea class="form-control" id="primary_markets" name="primary_markets" rows="3" onpaste="return false;" ondrop="return false;" autocomplete="off"></textarea>
+                    </div>
+                </div>
+                <!-- Section: Industry Codes and Product Information -->
+                <div class="form-page d-none" id="page3">
+                    <h4 class="mt-4" aria-level="2">Industry Codes and Product Information</h4>
+                    <p class="text-muted">Please enter information about your company's industry presence.</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="major_industry_category" class="form-label">Major Industry Category</label>
+                            <select class="form-select" id="major_industry_category" name="major_industry_category" >
+                                <option value="Automotive">Automotive</option>
+                                <option value="Aerospace">Aerospace</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Food and Beverage">Food and Beverage</option>
+                                <option value="Pharmaceuticals">Pharmaceuticals</option>
+                                <option value="Chemicals">Chemicals</option>
+                                <option value="Machinery">Machinery</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="major_industry_sub_category" class="form-label">Industry Sub-Category</label>
+                            <select class="form-select" id="major_industry_sub_category" name="major_industry_sub_category" >
+                                <option value="Automotive Parts">Automotive Parts</option>
+                                <option value="Aircraft Manufacturing">Aircraft Manufacturing</option>
+                                <option value="Semiconductor Manufacturing">Semiconductor Manufacturing</option>
+                                <option value="Dairy Products">Dairy Products</option>
+                                <option value="Medical Devices">Medical Devices</option>
+                                <option value="Agricultural Machinery">Agricultural Machinery</option>
+                                <option value="Other">Other</option>
+                            </select>    
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="duns_number" class="form-label">Company's <a href="https://www.dnb.com/duns.html">DUNS</a> Number</label>
+                            <input type="text" class="form-control" id="duns_number" name="duns_number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="napcs_number" class="form-label">Company's <a href="https://www.census.gov/naics/napcs/">NAPCS</a> Number</label>
+                            <input type="text" class="form-control" id="napcs_number" name="napcs_number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="naics_codes" class="form-label">Company's industry <a href="https://www.census.gov/naics/">NAICS</a> codes</label>
+                            <input type="text" class="form-control" id="naics_codes" name="naics_codes">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sic_codes" class="form-label">Company's industry <a href="https://www.sec.gov/search-filings/standard-industrial-classification-sic-code-list">SIC</a> codes</label>
+                            <input type="text" class="form-control" id="sic_codes" name="sic_codes">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ein_number" class="form-label">Company's <a href="https://www.sec.gov/search-filings/standard-industrial-classification-sic-code-list">Employee Identification Number</a></label>
+                        <input type="text" class="form-control" id="ein_number" name="ein_number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company_certifications" class="form-label">Company's Industrial Certifications/Recognitions</label>
+                        <input type="text" class="form-control" id="company_certifications" name="company_certifications" placeholder="eg. Awards, IP rights, Patents, Trademarks, Copyrights">
+                    </div>
+                    <div class="mb-3">
+                        <label for="company_equipment" class="form-label">Company Owned Equipment</label>
+                        <textarea class="form-control" id="company_equipment" name="company_equipment" placeholder="Equipment, Tools, Machinery used "></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="property_owned_rented" class="form-label">Property Owned/Rented?</label>
+                            <select class="form-select" id="property_owned_rented" name="property_owned_rented" >
+                                <option value="owned">Owned</option>
+                                <option value="rented">Rented</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="property_size" class="form-label">Property Size (sq. ft)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">sq. ft.</span>
+                                <input type="text" class="form-control" id="property_size" name="property_size">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="manufacturing_materials" class="form-label">Materials involved in manufacturing processes, if any</label>
+                        <textarea class="form-control" id="manufacturing_materials" name="manufacturing_materials" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="esg_initiatives" class="form-label">Company's ESG Initiatives - Recognition, Awards, Outreach</label>
+                        <textarea class="form-control" id="esg_initiatives" name="esg_initiatives" rows="3" placeholder="e.g. CSR Programs, Associations, Affiliations, Partnerships, Memberships"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="global_primary_products_services" class="form-label">Globally, what are your organization's primary Products / Services?</label>
+                        <textarea class="form-control" id="global_primary_products_services" name="global_primary_products_services" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ny_state_primary_products_services" class="form-label">In New York State, what are your organization's primary Products / Services?</label>
+                        <textarea class="form-control" id="ny_state_primary_products_services" name="ny_state_primary_products_services" rows="3"></textarea>
+                    </div>
+                </div>
+                <!-- Section: Workforce Size Information -->
+                <div class="form-page d-none" id="page4">
+                    <h4 class="mt-4" aria-level="2">Workforce Size Information</h4>
+                    <p class="text-muted">Please fill out the section below with close estimates of workforce size.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-4 mb-3">
+                            <label for="global_employees" class="form-label"> Global employees</label>
+                            <input type="number" min="0" class="form-control" id="global_employees" name="global_employees">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="us_employees" class="form-label">Employees in the USA</label>
+                            <input type="number" min="0" class="form-control" id="us_employees" name="us_employees">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="ny_state_employees" class="form-label">Employees in New York State</label>
+                            <input type="number" min="0" class="form-control" id="ny_state_employees" name="ny_state_employees">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="ny_state_location_employees" class="form-label">Employees at this NY Location</label>
+                            <input type="number" min="0" class="form-control" id="ny_state_location_employees" name="ny_state_location_employees">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="executive_roles" class="form-label">Executive Roles</label>
+                            <input type="number" min="0" class="form-control" id="executive_roles" name="executive_roles" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="leadership_roles" class="form-label">Middle Management</label>
+                            <input type="number" min="0" class="form-control" id="leadership_roles" name="leadership_roles" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="professional_support_roles" class="form-label">Professional Support Functions</label>
+                            <input type="number" min="0" class="form-control" id="professional_support_roles" name="professional_support_roles" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="engineering_roles" class="form-label">Engineering Roles</label>
+                            <input type="number" min="0" class="form-control" id="engineering_roles" name="engineering_roles" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="technician_roles" class="form-label">Technician Roles</label>
+                            <input type="number" min="0" class="form-control" id="technician_roles" name="technician_roles" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="other_roles" class="form-label">Other Roles</label>
+                            <input type="number" min="0" class="form-control" id="other_roles" name="other_roles" min="0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="percent_location_employees_semiconductor_mfg" class="form-label">Percentage of workforce at this location aligned to Semiconductor Manufacturing</label>
+                        <div class="input-group">
+                            <span class="input-group-text">%</span>
+                            <input type="number" min="0" class="form-control" id="percent_location_employees_semiconductor_mfg" name="percent_location_employees_semiconductor_mfg">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="workforce_projections_next_36months" class="form-label">What are your workforce projections for the next 36 months?</label>
+                        <textarea class="form-control" id="workforce_projections_next_36months" name="workforce_projections_next_36months" rows="3"></textarea>
+                    </div>
+                </div>
+                <!-- Section: Semiconductor Manufacturing Industry Suggestions -->
+                <div class="form-page d-none" id="page5">
+                    <h4 class="mt-4" aria-level="2">Semiconductor Manufacturing Industry Suggestions</h4>
+                    <p class="text-muted">Please provide your opinions on the state of the semiconductor manufacturing industry.</p>
+                    <div class="mb-3">
+                        <label for="company_role_semiconductor_industry" class="form-label">Please describe the role your company plays in the semiconductor industry</label>
+                        <textarea class="form-control" id="company_role_semiconductor_industry" name="company_role_semiconductor_industry" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="semiconductor_mfg_shortcomings" class="form-label">Are there specific shortcomings within the semiconductor manufacturing scope? (Detail materials, products, services, workforce, property, facilities, and support services.)</label>
+                        <textarea class="form-control" id="semiconductor_mfg_shortcomings" name="semiconductor_mfg_shortcomings" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pivot_opportunities" class="form-label">Are there opportunities for your company to pivot operations?</label>
+                        <textarea class="form-control" id="pivot_opportunities" name="pivot_opportunities" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state_emphasis_suggestions" class="form-label">What suggestions would you offer to improve the State's emphasis into this space?</label>
+                        <textarea class="form-control" id="state_emphasis_suggestions" name="state_emphasis_suggestions" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="special-field" for="name">Full Name:</label>
+                        <input class="special-field" type="text" value="n" id="_name" name="_name" required>
+                    </div>
+                </div>
+                <!-- Hidden field to capture page load time -->
+                <input type="hidden" id="form_load_time" name="form_load_time" value="{{ page_load_time }}">
+                <!-- Hidden field to capture session ID -->
+                <input type="hidden" id="session_id_form_field" name="session_id_form_field" value="">
+                <!-- Form Navigation buttons -->
+                <div class="mt-5">
+                    <div class="d-flex justify-content-center my-6" role="navigation">
+                        <button type="button" class="btn nav-btn rounded-circle mx-2" title="Previous" aria-label="Previous" id="prevBtn" onclick="nextPrev(-1)"><i class="bi bi-arrow-left"></i></button>
+                        <button type="button" class="btn nav-btn rounded-circle mx-2" title="Next" aria-label="Next" id="nextBtn" onclick="nextPrev(1)"><i class="bi bi-arrow-right"></i></button>
+                        <button type="submit" class="btn nav-btn-royal-blue rounded-circle mx-2" title="Submit" aria-label="Submit" id="submit-button"  onclick="prepare_form_data()"><i class="bi bi-check2"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-auto py-4 bg-royal-blue text-white">
+    <div class="container text-center">
+        <div class="row">
+            <!-- Footer Links -->
+            <div class="col-md-4 mb-3">
+                <a href="https://management.buffalo.edu/">
+                    <img src="https://management.buffalo.edu/content/dam/mgt/Shared-Images/logo-white.png" alt="School of Management, University at Buffalo" style="width: 300px;"/>
+                </a>
+                <br>
+            </div>
+            <!-- Footer Disclaimers -->
+            <div class="col-md-4 mb-3">
+                <h6 class="text-uppercase fw-bold" aria-level="3">Disclaimer</h6>
+                <p class="small">This website collects session information. Use of this site is subject to UB's <a class="text-white" href="//www.buffalo.edu/administrative-services/policy1/ub-policy-lib/privacy.html">Privacy Policy</a>.</p>
+            </div>
+            <!-- Footer Contact Info -->
+            <div class="col-md-4 mb-3">
+                <h6 class="text-uppercase fw-bold" aria-level="3">Contact Us</h6>
+                <p class="small">
+                    <i class="bi bi-envelope text-white"></i><a class="text-white" href="mailto:ubsomrf1@outlook.com"> UB SOM Research Team</a><br>
+                    <i class="bi bi-geo-alt"></i> 160 Jacobs Management Center <br> Buffalo, NY 14260-4000
+                </p>
+            </div>
+        </div>
+        <!-- Copyright -->
+        <div class="row">
+            <div class="col-12 mt-3">
+                <p class="small mb-0">&copy; 2024 <a class="text-white" href="//www.buffalo.edu/">University at Buffalo.</a> All rights reserved. | <a class="text-white" href="//www.buffalo.edu/administrative-services/policy1/ub-policy-lib/privacy.html">Privacy</a>  |  <a class="text-white" href="//www.buffalo.edu/access/about-us/contact-us.html">Accessibility</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
+</body>
+</html>
