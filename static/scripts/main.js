@@ -140,7 +140,7 @@ function populateFormFields(form_data) {
 };
 
 function downloadFile(format) {
-    fetch("{{ url_for('dashboard') }}", {
+    fetch("/dashboard", {
         method: "POST",
         body: JSON.stringify({ format: format }),
         headers: {
