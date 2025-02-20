@@ -67,7 +67,7 @@ class MySQLDatastore:
             "id": Column(Integer, primary_key=True),
         }
         attributes['id'] = Column(String(255), nullable=False, primary_key=True)
-        attributes['timestamp'] = Column(DateTime, nullable=False, primary_key=True)
+        attributes['timestamp'] = Column(DateTime, nullable=False, primary_key=False)
 
         # Then build the remainder of the schema dynamically from the form config file
         config_folder = os.path.join('config',config_folder)
