@@ -5,7 +5,7 @@ from sqlalchemy.dialects.mysql import insert
 from utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
-from flask_migrate import Migrate
+from flask_migrate import migrate, Migrate, init, upgrade
 import mysql.connector
 import pandas as pd
 import os
@@ -31,15 +31,16 @@ class MySQLDatastore:
             app.config[key] = value
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
-        
+        self.migrate = Migrate(self.app,self.db)
         # Initialize the ORM engine and track schema modifications
         self.db.init_app(self.app)
+        self.migrate.init_app(self.app, self.db)
         if not os.path.exists('migrations'):
             print('INFO: Initial setup, no migrations folder found. Creating new MySQL table.')
-            self.db.create_all()
-            from flask_migrate import init
-            init()
-        self._refresh_table_schema()
+            with self.app.app_context():
+                self.db.create_all()
+                init()
+        self._refresh_table_schema() 
         self.create_engine()
     
     def create_engine(self):
@@ -91,10 +92,8 @@ class MySQLDatastore:
         self.con.close()
     
     def _refresh_table_schema(self):
-        # Track and auto-apply schema changes using flask-migrate (Alembic)
-        migrate = Migrate(self.app,self.db)   
+        # Track and auto-apply schema changes using flask-migrate (Alembic)   
         with self.app.app_context():
-            from flask_migrate import migrate, upgrade
             migrate(message="automigration")
             upgrade()
     
