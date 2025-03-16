@@ -85,6 +85,10 @@ class DatastoreManager(BaseDatastoreManager):
     def read_data(self, id=None):
         """
         A query interface into the datastore; an optional ID controls if a specific row or all rows are returned.
+
+        Args:
+            id(str): A session_id value to look up in the datastore. If blank, all results are returned.
+
         """
         return self.datastore.query(id)
     

@@ -2,18 +2,48 @@ import yaml
 import pandas as pd
 import numpy as np
 import os
-from pprint import pprint
 from bs4 import BeautifulSoup as soup
 
+from loggers.managers import LoggerManager
+
 def prettify_raw_html(html_string, engine='bs4'):
+    """
+    Helper function to properly format generated raw HTML. Currently, only BeautifulSoup4's html.parser is supported.
+    
+    Args:
+        html_string(str): A string of raw, unformatted HTML
+        engine(str): (Default='bs4') The parsing engine to use. Currently, only BeautifulSoup4's html.parser is supported.
+
+    Returns:
+        A well-formatted HTML string.
+    """
     if engine == 'bs4':
         return soup(html_string, features='html.parser').prettify()
 
 def generate_html_for_field(field):
+    """
+    Utility function to generate a specific type of HTML for a specified field according to formatting information.
+
+    Args:
+        field(dict): A dict containing HTML formatting information about a form field. This information is sourced from the 
+                     form_config Excel sheet and contains the following keys:
+
+                     1. 'backend_field_name': The key against which the form submission data for this field is stored. Different
+                        from the display name. This string must not contain any spaces.
+                     2. 'field_label': The display name for the field; may contain spaces, web-safe characters etc.
+                     3. 'required': A Yes/No field that controls whether a field is required to be populated in the form before submission.
+                     4. 'field_type': One of 'input', 'select' or 'text'. Determines the corresponding HTML input element to be used.
+                     5. 'data_type': An unused field that is primarily used for SQLAlchemy ORM purposes.
+                     6. 'select_options': A list of choices to be rendered in HTML dropdown boxes when the field_type is 'select'.
+    Returns:
+        A HTML representation of the specified field, built according to the formatting information provided (see above)
+    """
+    logger = LoggerManager.get_logger()
+
     field_type = field.pop('field_type')
     modifier_keys = {
-        'field_required': 'required' if field['required'] == 'Yes' else '',
-        'field_required_style': 'required-field' if field['required'] == 'Yes' else '',
+        'field_required': 'required' if field['required'].lower() == 'yes' else '',
+        'field_required_style': 'required-field' if field['required'].lower() == 'yes' else '',
         'col_size_modifier': 'col-md-6' if field.get('group_id') else ''
     }   
     if field_type == 'input':    
@@ -41,7 +71,7 @@ def generate_html_for_field(field):
         </div>"""
         return text_field_template.format(**{**modifier_keys, **field})
     else:
-        print(f"Unknown field type '{field_type}' for field '{field['backend_field_name']}'")
+        logger.error(f"Unknown field type '{field_type}' for field '{field['backend_field_name']}'")
         return ''
 
 def generate_html_for_page(page_number, page_config, field_html):
@@ -65,6 +95,8 @@ def generate_html_for_input_group_end():
     return "</div>"
 
 def generate_form_html_from_config_file(config_folder='formbuilder',config_filename='wny_config.xlsx'):
+    logger = LoggerManager.get_logger()
+    logger.info("Attempting to generate form HTML using config file configured at {config_folder}/{config_filename}")
     config_filepath = os.path.join(config_folder, config_filename) if config_folder else config_filename
     config_workbook = pd.ExcelFile(config_filepath)
     form_pages = pd.read_excel(config_workbook, 'Pages').set_index('page_number').to_dict(orient='index')

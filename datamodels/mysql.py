@@ -75,9 +75,6 @@ class MySQLDatastore:
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
         self.engine = create_engine(self.sqlalchemy_database_uri, echo=True)
-
-    def check_connection(self):
-        pass
     
     def generate_database_uri_from_config(self, mysql_config_params):
         """
@@ -95,6 +92,7 @@ class MySQLDatastore:
             hostname=mysql_config_params['mysql_hostname'],
             databasename=mysql_config_params['mysql_database']
         )
+        self.logger.info(f"Generated SQLAlchemy URI: {SQLALCHEMY_DATABASE_URI}")
         return SQLALCHEMY_DATABASE_URI
     
     def generate_table_orm_from_config_file(self, config_folder='formbuilder',config_filename='wny_config.xlsx'):
@@ -142,14 +140,25 @@ class MySQLDatastore:
                 database=mysql_config_params['mysql_database']
         )
         self.con.close()
+        self.logger.info('Datastore connection check OK.')
     
     def _refresh_table_schema(self):
-        """Helper function to track and auto-apply schema changes using flask-migrate (Alembic)   """
+        """Helper function to track and auto-apply schema changes using flask-migrate (Alembic)."""
         with self.app.app_context():
             migrate(message="automigration")
             upgrade()
     
     def upsert_data(self, submission_data):
+        """
+        Perform an UPSERT (UPDATE row with the same session_id as the submission data, INSERT if such a row does not exist)
+        against the data in the database using the provided submission data.
+
+        Args:
+            submission_data(dict): A JSON-equivalent dict containing form submission information.
+
+        Returns:
+            None
+        """
         # Create a session
         with Session(self.engine) as session:
             # Create an instance of the dynamic model
@@ -157,14 +166,28 @@ class MySQLDatastore:
             upsert_stmt = stmt.on_duplicate_key_update(**submission_data)
             session.execute(upsert_stmt)
             session.commit()
-            print(f"Upserted row into {self.table_name}: {submission_data}")
+            self.logger.info(f"Upserted row into {self.table_name}: {submission_data}")
     
     def upsert_bulk_data(self, bulk_upload_data):
+        """
+        Perform a bulk UPSERT (UPDATE rows with the same session_ids as the submission data, INSERT if such rows do not exist). Also
+        ensure that the 'id' and 'timestamp' fields are added to the data if they do not already exist. The 'id' and 'timestamp' fields
+        are not case-sensitive but must be included if updating existing data. 
+
+        Args:
+            bulk_upload_data(pd.DataFrame): A Pandas DataFrame that contains several instances (rows) of form submission data.
+
+        Returns:
+            None
+        """
         # Ensure the default id and timestamp fields are present in the dataframe 
         num_rows = len(bulk_upload_data)
-        if 'id' not in bulk_upload_data.columns:
+        bulk_upload_data_columns = [x.lower() for x in bulk_upload_data.columns]
+        if 'id' not in bulk_upload_data_columns:
+            self.logger.warrning("The 'id' field was not found in the uploaded dataset. New IDs will be generated.")
             bulk_upload_data['id'] = [generate_websafe_session_id(self.config['general']['websafe_session_id_size']) for _ in range(len(bulk_upload_data))]
-        if 'timestamp' not in bulk_upload_data.columns:
+        if 'timestamp' not in bulk_upload_data_columns:
+            self.logger.warrning("The 'timestamp' field was not found in the uploaded dataset. New timestamps will be generated.")
             bulk_upload_data['timestamp'] = datetime.now()
         # Prepare the data for bulk upsertion by converting it to a dict
         bulk_upload_data = bulk_upload_data.where((pd.notnull(bulk_upload_data)), None)
@@ -177,9 +200,18 @@ class MySQLDatastore:
             upsert_stmt = stmt.on_duplicate_key_update(update_dict)
             session.execute(upsert_stmt)
             session.commit()
-            print(f"Bulk-upserted {num_rows} row(s) into {self.table_name}")
+            self.logger.info(f"Bulk-upserted {num_rows} row(s) into {self.table_name}")
 
     def query(self, id=None):
+        """
+        Query the MySQL database associated with this Datastore instance; return all rows or a specific one using an ID if provided.
+
+        Args:
+            id(str): (Optional) An optional session_id value to look up in the underlying MySQL database.
+
+        Returns:
+            A Pandas DataFrame object containing query results.  
+        """
         with Session(self.engine) as session:
             query = session.query(self.table_model)
             if id:
