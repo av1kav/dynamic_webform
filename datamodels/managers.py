@@ -46,9 +46,9 @@ class DatastoreManager(BaseDatastoreManager):
             # 1. Information about whether the file exists or not at initialization
             local_store_filename = config['datastore']['datastore_file_name']
             if os.path.exists(local_store_filename):
-                print('INIT: Local store file exists; appending data.')
+                self.logger.info('INIT: Local store file exists; appending data.')
             else:
-                print("Local datastore does not exist.")
+                self.logger.info("Local datastore does not exist.")
         elif self.datastore_type == 'mysql':
             # TODO: Ensure critical keys available in dict
             self.datastore = MySQLDatastore(app, config)

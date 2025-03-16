@@ -9,7 +9,20 @@ import pandas as pd
 import yaml
 import io
 
+from loggers.managers import LoggerManager
+
 def download_datastore_in_specific_format(datastore, target_format):
+    """
+    Utility function to download the contents of the specified datastore 
+
+    Args:
+        datastore(datamodels.DatastoreManager): A DatastoreManager object configured with a backend Datastore.
+        target_format(str): One of 'excel', 'parquet', 'json'. Specifies the format in which the datastore's contents 
+                            should be downloaded. Ensure page JS specifies one of the keys above in any AJAX calls.
+    
+    Returns:
+        A Flask URL redirect to the dashboard page.
+    """
     df = datastore.read_data()
     buffer = io.BytesIO()
     if target_format == 'excel':
@@ -28,13 +41,33 @@ def download_datastore_in_specific_format(datastore, target_format):
         return redirect(url_for('dashboard'))
 
 def read_instance_config(config_folder='config', config_file_name='config.yaml'):
-    """Read main configuration file from the config folder and return a verified configuration dict"""
+    """
+    Utility function to read main configuration YAML from the config folder and return a verified configuration dict.
+    By default, the function expects a file called config/config.yaml, and it is recommended to keep it that way.
+    
+    Args:
+        config_folder(str): (Optional, default='config') The name of the folder containing the config YAML.
+        config_file_name(str): (Optional, default='config.yaml') The name of the folder containing the config YAML.
+    
+    Returns:
+        A dictionary containing all configuration information in the YAML file.
+    """
     with open(os.path.join(config_folder,config_file_name)) as handle:
         config = yaml.safe_load(handle)
     # TODO: Ensure critical keys available in dict
     return config
 
 def read_uploaded_dataset(file_path, config):
+    """
+    Utility function to read an uploaded file, usually for bulk data uploads, as a Pandas DataFrame.
+
+    Args:
+        file_path(str): The path of the file to be read.
+        config(dict): The main instance configuration (from YAML)
+    
+    Returns:
+        A Pandas DataFrame containing the contents of the uploaded file.
+    """
     if file_path.endswith('csv'):
         df = pd.read_csv(file_path)
     elif file_path.endswith('xlsx'):
@@ -42,6 +75,16 @@ def read_uploaded_dataset(file_path, config):
     return df
     
 def is_valid_filename(filename, config):
+    """
+    Utility function to check whether a filename is compliant with the formats specified in the instance configuration.
+
+    Args:
+        filename(str): The name of the file.
+        config(dict): The main instance configuration (from YAML)
+
+    Returns:
+        True if the filename is compliant, and False otherwise.
+    """
     allowed_formats = config['datastore'].get('data_upload').get('allowed_formats', [])
     if '.' in filename and filename.split('.')[-1] in allowed_formats:
         return True
@@ -50,22 +93,46 @@ def is_valid_filename(filename, config):
 
 def generate_websafe_session_id(size=8):
     """
-    Generate and return a web-safe hexadecimal number of a specific size.
+    Utility function to generate and return a web-safe hexadecimal number of a specific size.
     
     Args:
-        size: A positive integer value that specifies the length of the string to be generated
+        size(uint): (Optional, default=8) A positive integer value that specifies the length of the string to be generated. Should be
+        at least 8 digits long, and will be force-set to 8 if the configured value is less than 8 for safety and stability.
     
     Returns:
         A generated hexadecimal string of the specified size. 
-    
     """
+    logger = LoggerManager.get_logger()
+    if size < 8:
+        logger.warning(f"The 'size' parameter provided to the generate_websafe_session_id method is less than {size}. For safety and stability, this value will be ignored and the default value of {size} will be used.")
     return secrets.token_hex(size)
 
 def scrape_form_content(config_dict):
     """
-    Scrape the specified form for field labels, input types and names return them as a dict.
+    (Deprecated) Utility function to scrape the specified (static) form for field labels, input types and names return them as a dict. This method,
+    while perfectly valid, is not currently in use since forms are now dynamic and cannot be parsed directly from source files. 
     
+    Args:
+        config_dict(dict): A helper configuration dict containing the following keys:
+            1. form_id: The value of the HTML 'id' element in the <form> definition of the webform
+            2. form_html_file: The name of the source file containing the (static) form HTML
+    Returns:
+        Form content parsed into a JSON document in the following format:
+        [ 
+                {
+                    'field_label': '',
+                    'field_name': '',
+                    'field_type': '',
+                    'input_type': '',
+                    'is_required': '',
+                    'select-options': [
+                        {'backend_value': '', 'display_text': ''},
+                    ]
+                },
+                ...    
+            ]
     """
+
     if 'form_html_file' not in config_dict or 'form_id' not in config_dict:
         raise RuntimeError("Please ensure that both the 'form_id' and 'form_html_file' keys are specified in the provided config_dict.")
 
@@ -99,9 +166,11 @@ def scrape_form_content(config_dict):
 
 def generate_html_table_using_form_content_html(form_content):
     """
-    Generate and return an HTML table string to neatly display form_content generated by the scrape_form_content function.
+    (Deprecated) Utility function to generate and return an HTML table string to neatly display form_content generated by the 
+    scrape_form_content function.
 
-    :param: json_data: A JSON document in the form
+    Args:
+        json_data: A JSON document in the form:
             [ 
                 {
                     'field_label': '',
@@ -116,7 +185,8 @@ def generate_html_table_using_form_content_html(form_content):
                 ...    
             ]
             that is generated using the scrape_form_content function.
-    :returns: HTML string representing table that can be displayed within a webpage
+    Returns:
+        An HTML string containing a <table> that contains form information and can be rendered as HTML.
     """
 
     html_start="""
@@ -161,29 +231,39 @@ def generate_html_table_using_form_content_html(form_content):
     html_content = html_start.format(md5_string=md5_string) + rows + html_end
     return html_content
 
-
-
-def ip_info_check(ip_address):
+def ip_info_check(ip_address, form_validation_options):
     """
-    Return a set of information fields for the specified IP address.
+    Utility function to return a set of information fields for the specified IP address.
 
     This method retrieves metadata for the originating IP address of the connecting client (i.e. user IP)
     in order to be used for submission validation. Currently, all details returned by the IPInfo service
     are returned, but future revisions will require a list of keys that should be retrieved.
 
     Args:
-        ip_address: A str containing the target IP address
+        ip_address(str): A string containing the target IP address
+        form_validation_options(dict): A subset of the instance configuration dict specifically for 
+            advanced analytics options. Must contain a valid token against the key 'ipinfo_token'
+            under the 'sessiondata' key in the instance configuration. For example:
+            
+            advanced_analytics:
+                form_validations:
+                    sessiondata:
+                        ipinfo_token: abc6c819b58d
     Returns:
         A dict containing all metadata fron the IPInfo service for the specified IP
     """
-    access_token = 'fe76c819b5c55e' # Registered to avenugop@buffalo.edu
-    handler = ipinfo.getHandler(access_token)
-    details = handler.getDetails(ip_address).all
-    return details
-
+    logger = LoggerManager.get_logger()
+    access_token = form_validation_options['sessiondata'].get('ipinfo_token')
+    if access_token:
+        handler = ipinfo.getHandler(access_token)
+        details = handler.getDetails(ip_address).all
+        return details
+    else:
+        logger.warning("An ipinfo access token was not specified under the 'sessiondata' key. Specify a valid token value for the  ipinfo_token key under the sessiondata config, or see docs for ip_info_check().")
+        
 def get_ip_address():
     """
-    Return session IP address based on request headers.
+    Utility function to extract and return client session IP address from request headers.
     
     Args:
         None
@@ -198,19 +278,24 @@ def get_ip_address():
 
 def l1_validations(session_info):
     """
-    Level-1 validations on session data.
+    (Experimental) Level-1 validations on session data.
     
     This method performs a set of validations on the provided session metadata 
     and returns a dictionary with results. The list of validations is arbitrary
     and can be found in project documentation.
     
+    Args:
+        session_info: A dict containing session metadata
+    Returns:
+        A dict containing validations and their results. 
+
     This method is currently a stub and returns an empty dictionary.
     """
     return {}
 
 def l2_validations(session_info):
     """
-    Level-2 validations on session data.
+    (Experimental) Level-2 validations on session data.
 
     This method performs a set of validations on the provided session metadata 
     and returns a dictionary with results. The list of validations is arbitrary
@@ -228,7 +313,7 @@ def l2_validations(session_info):
 
 def l3_validations(session_info):
     """
-    Level-3 validations on session data.
+    (Experimental) Level-3 validations on session data.
 
     This method performs a set of validations on the provided session metadata 
     and returns a dictionary with results. The list of validations is arbitrary
@@ -238,6 +323,8 @@ def l3_validations(session_info):
         session_info: A dict containing session metadata
     Returns:
         A dict containing validations and their results.  
+    
+    This method is currently a stub and returns an empty dictionary.
     """
     results = {}
 
@@ -249,27 +336,46 @@ def l3_validations(session_info):
         results['elapsed_time_validation_pass'] = False
     return results
 
+def send_session_id_reminder_email(destination_address, session_id, config):
+    """
+    Utility function to send a reminder email to users who submit the web form, even partially, to the specified destination
+    email address. The specific form field that contains this address is not fixed and so is up to the programmer to pass into
+    this utility function.
 
-def send_session_id_reminder_email(destination_address, session_id):
-    # Sandbox API URL format: https://api.mailgun.net/v3/sandbox&lt;ID&gt;.mailgun.org/messages
-    MAILGUN_API_URL = "https://api.mailgun.net/v3/sandboxf7cf6f2359994397ab1b7a150ce5c6fa.mailgun.org/messages"
-    FROM_EMAIL_ADDRESS = "Excited User <mailgun@sandboxf7cf6f2359994397ab1b7a150ce5c6fa.mailgun.org>"
-    to_address = destination_address,
-    subject = 'reminder'
-    message = f"your session id is {session_id}"
-    api_key = "98420c6821f675a1c83d5de491df6ced-9c3f0c68-678b2533"
+    Args:
+        destination_address(str): The destination email address to which the reminder will be sent
+        session_id(str): The session_id of the session in which the form submission was made.
+    
+    Returns:
+        None
+    """
 
-    resp = requests.post(
-        MAILGUN_API_URL,
-         auth=("api", api_key),
-         data={
-            "from": FROM_EMAIL_ADDRESS,
-            "to": to_address,
-            "subject": subject,
-            "text": message
-        }
-    )
-    if resp.status_code == 200: # success
-        print(f"Successfully sent an email to '{to_address}' via Mailgun API.")
-    else: # error
-        print(f"Could not send the email, reason: {resp.text}")
+    logger = LoggerManager.get_logger()
+    email_config = config.get('email')
+    if email_config and 'sender_address' in email_config and 'provider' in email_config:
+        provider_name = email_config['provider']['provider_name']
+        logger.info("Configured email provider: {provider_name}")
+        API_URL = email_config['provider']['http_service_api_url']
+        FROM_EMAIL_ADDRESS = email_config['sender_address']
+        api_key = email_config['provider']['api_key']
+        to_address = destination_address
+        
+        subject = 'Submission Reminder'
+        message = f"Thank you for your form submission!\n\n Your session id was {session_id}. If you would like to pick up where you left off, please use it to restore your session.\n\nUB SOM Research"
+
+        resp = requests.post(
+            API_URL,
+            auth=("api", api_key),
+            data={
+                "from": FROM_EMAIL_ADDRESS,
+                "to": to_address,
+                "subject": subject,
+                "text": message
+            }
+        )
+        if resp.status_code == 200:
+            logger.info(f"Successfully sent an email to '{to_address}' via {provider_name} API.")
+        else:
+            logger.warning(f"Email provider API response failed: {resp.text}")
+    else:
+        logger.warning("The 'sender_address' and 'provider' keys were not configured correctly for email functionality. Aborting email attempt.")

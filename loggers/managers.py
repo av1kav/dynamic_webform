@@ -37,7 +37,7 @@ class LoggerManager(BaseLoggerManager):
         if not cls._logger_instance:
             cls.config = config
             cls.logging_dictConfig = cls.config['system']['logging']
-            cls.logger_name = cls.logging_dictConfig['loggers'].items()[0]
+            cls.logger_name = next(iter(cls.logging_dictConfig['loggers'].keys()))
             cls.log_dir = cls.logging_dictConfig['log_dir']
             os.makedirs(cls.log_dir, exist_ok=True)
             logging.config.dictConfig(cls.logging_dictConfig)

@@ -1,11 +1,14 @@
 import pandas as pd
 import os
 
+from loggers.managers import LoggerManager
+
 class ParquetLocalDataStore:
     """
-    Base class (deprecated) for local file storage (no, not a SQLite DB, an actual file)
+    (Deprecated) Datastore class to handle data storage as a local Parquet file.
     """
     def __init__(self):
+        self.logger = LoggerManager.get_logger()
         raise DeprecationWarning("This class is not meant to be used in a production environment.")
     
     def append_or_update_data_to_local_store(self, data, config, format='parquet'):
@@ -31,21 +34,21 @@ class ParquetLocalDataStore:
         if format != 'parquet':
             raise ValueError("Currently, only 'parquet' is supported as a format")
         if os.path.exists(local_store_filename):
-            print('Local store file exists; appending data.')
+            self.logger.info('Local store file exists; appending data.')
             existing_data = pd.read_parquet(local_store_filename)
             df = pd.DataFrame.from_dict([data])
             # If data for the same ID exists, update; otherwise insert
             matching_rows = existing_data.loc[existing_data['id'] == df['id'].values[0]]
             if matching_rows.empty:
-                print(f"No match for id '{df['id'].values[0]}' in local data store. INSERT")
+                self.logger.info(f"No match for id '{df['id'].values[0]}' in local data store. INSERT")
                 df = pd.concat([df, existing_data])
                 df.to_parquet(local_store_filename, index=False)
             else:
-                print(f"Existing data found for id '{df['id'].values[0]}' in local data store. UPDATE")
+                self.logger.info(f"Existing data found for id '{df['id'].values[0]}' in local data store. UPDATE")
                 existing_data.update(df)
                 existing_data.to_parquet(local_store_filename, index=False)
         else:
-            print('Creating new local store object.')
+            self.logger.info('Creating new local store object.')
             df = pd.DataFrame.from_dict([data])
             df.to_parquet(local_store_filename, index=False)
 
@@ -62,7 +65,7 @@ class ParquetLocalDataStore:
         local_store_filename = config['datastore']['datastore_file_name']
         
         if not os.path.exists(local_store_filename):
-            print('No local store file created/present.')
+            self.logger.warning('No local store file created/present.')
             return pd.DataFrame.from_dict([{'id': 'Warning: There is no information in the local datastore yet.'}])
         else:
             return pd.read_parquet(local_store_filename)

@@ -14,13 +14,13 @@ import os
 # Read instance config YAML and form schema
 config = read_instance_config(config_folder='config', config_file_name='config.yaml')
 form_schema = generate_schema_from_config_file(config_folder=os.path.join('config',config['form']['form_config_folder']),config_filename=config['form']['form_config_file_name'])
+# Initialize logging
+app_logger = LoggerManager.get_logger(config)
 # Define Flask app and set app-level configs
 app = Flask(__name__)
 app.secret_key = config['general']['legacy_flask_app_secret_key']
 # Initialize datastore manager
 datastore = DatastoreManager(app, config)
-# Initialize logging
-app_logger = LoggerManager.get_logger(config)
 
 ## App Routes ##
 @app.route('/')
@@ -79,7 +79,7 @@ def submit():
         # Optionally add advanced analytics form validation features based on config
         advanced_analytics_form_validation_options = config['advanced_analytics']
         if advanced_analytics_form_validation_options:
-            if 'sessiondata' in advanced_analytics_form_validation_options:
+            if 'sessiondata' in advanced_analytics_form_validation_options.keys():
                 app_logger.info("Found 'sessiondata' key in config; enabling session metadata recording.")
                 # Session data 
                 _name = request.form.get('_name','Not Enabled') # Honeypot field
@@ -98,11 +98,11 @@ def submit():
                     "hpfm": _name, # Honeypot Field Modified?
                     "elapsed_time": time_taken
                 })
-                submission_data.update(ip_info_check(ip_address))
-            if 'L2' in advanced_analytics_form_validation_options:
+                submission_data.update(ip_info_check(ip_address, form_validation_options=advanced_analytics_form_validation_options))
+            if 'L2' in advanced_analytics_form_validation_options.keys():
                 app_logger.info("Found 'L2' key in config; enabling L2 form validation metadata recording.")
                 submission_data.update(l2_validations(submission_data))
-            if 'L3' in advanced_analytics_form_validation_options:
+            if 'L3' in advanced_analytics_form_validation_options.keys():
                 app_logger.info("Found 'L3' key in config; enabling L3 form validation metadata recording.")
                 submission_data.update(l3_validations(submission_data))
         
@@ -135,7 +135,7 @@ def thank_you():
         if session.get('applicant_email_for_reminder_email'):
             session_id = session.pop('session_id_for_reminder_email')
             destination_address = session.pop('applicant_email_for_reminder_email')
-            send_session_id_reminder_email(destination_address=destination_address, session_id=session_id)
+            send_session_id_reminder_email(destination_address=destination_address, session_id=session_id, config=config)
             message = f"Thank you for your response. We have sent the session ID of this submission to '{destination_address}'. Please use it to restore the session if needed, and contact support if you did not receive the email. For reference, the session ID is also displayed below."
             session.pop('applicant_email_for_reminder_email')
         # If the email field was not filled out, remind the user of the session ID but don't send an email.
@@ -263,6 +263,7 @@ def upload_file():
             return jsonify({"error": "No selected file"}), 400
         
         if file and is_valid_filename(file.filename, config=config):
+            app_logger.info("Uploading filename: {file.filename}")
             filename = secure_filename(file.filename)
             file_path = os.path.join(config['datastore']['data_upload']['data_upload_folder'], filename)
             file.save(file_path)
