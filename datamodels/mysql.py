@@ -10,6 +10,8 @@ import mysql.connector
 import pandas as pd
 import os
 
+from loggers.managers import LoggerManager
+
 SQLALCHEMY_TYPE_MAPPING = {
     "INTEGER": Integer,
     "STRING": String(255),
@@ -20,23 +22,50 @@ SQLALCHEMY_TYPE_MAPPING = {
 db = SQLAlchemy()
 
 class MySQLDatastore:
+    """
+    SQLAlchemy-interfaced, ORM-bound MySQL Datastore class. Implements low-level data operations on a configured MySQL instance.
+
+    Attributes:
+        app(Flask): The Flask app implementing this Datastore instance.
+        db(SQLAlchemy): The Flask-SQLAlchemy instance used to perform ORM-bound operations
+        config(dict): The full contents of the config.yaml configuration file
+        table_name(str): The name of the table that will contain form submission data (from config)
+        table_model(db.Model): A SQLAlchemy model of the table, generated at runtime using the form_config Excel sheet
+        migrate(Migrate): An Alembic Migrate object used to initialize and govern migrations (changes in schema)
+        logger(LoggerManager): A singleton logger instance for logging.
+        sqlalchemy_database_uri: A SQLAlchemy URI generated using the config and added to the app dictionary
+        engine: A SQLAlchemy ORM Engine to handle specific low-level data operations
+    """
     def __init__(self, app, config):
+        """
+        Set up a MySQL connection, initialize the ORM engine and use Alembic to perform any necessary migrations.
+
+        Args:
+            app(Flask): The Flask app implementing this Datastore instance.
+            config(dict): The full contents of the config.yaml configuration file
+        Returns:
+            None
+        """
         self.app = app
         self.db = db
         self.config = config
+        self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
+        self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
+        self.migrate = Migrate(self.app,self.db)
+        self.logger = LoggerManager.get_logger()
+
+        # Set up MYSQL connection parameters
         mysql_config_params = self.config['datastore']['datastore_params']
         self.sqlalchemy_database_uri = self.generate_database_uri_from_config(mysql_config_params=mysql_config_params)
         self.app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_database_uri
         for key, value in mysql_config_params.get('mysql_sqlalchemy_engine_options',{}).items():
             app.config[key] = value
-        self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
-        self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
-        self.migrate = Migrate(self.app,self.db)
+        
         # Initialize the ORM engine and track schema modifications
         self.db.init_app(self.app)
         self.migrate.init_app(self.app, self.db)
         if not os.path.exists('migrations'):
-            print('INFO: Initial setup, no migrations folder found. Creating new MySQL table.')
+            self.logger.info('Initial setup, no migrations folder found. Creating new MySQL table.')
             with self.app.app_context():
                 self.db.create_all()
                 init()
@@ -44,12 +73,22 @@ class MySQLDatastore:
         self.create_engine()
     
     def create_engine(self):
+        """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
         self.engine = create_engine(self.sqlalchemy_database_uri, echo=True)
 
     def check_connection(self):
         pass
     
     def generate_database_uri_from_config(self, mysql_config_params):
+        """
+        Helper function to cleanly generate a MySQL-specific SQLAlchemy Database URI for the app dictionary.
+        
+        Args:
+            mysql_config_params(dict): A subset of MySQL-specific configuration parameters from the config.yaml file
+        
+        Returns:
+            SQLALCHEMY_DATABASE_URI(str): A formatted SQLAlchemy database URI.
+        """
         SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
             username=mysql_config_params['mysql_username'],
             password=mysql_config_params['mysql_password'],
@@ -59,7 +98,19 @@ class MySQLDatastore:
         return SQLALCHEMY_DATABASE_URI
     
     def generate_table_orm_from_config_file(self, config_folder='formbuilder',config_filename='wny_config.xlsx'):
+        """
+        Generates an Object-Relational Mapper (ORM) that is an object representation of the actual database table. Generated 
+        dynamically using the form_config Excel sheet, and is used to control data operations on the underlying table.
+
+        Args:
+            config_folder(str): (Optional, default='formbuilder') The name of the folder, under the config/ directory, 
+                                containing the form_config Excel sheet.
+            config_filename(str): (Optional, default='wny_config.xlsx') The name of the actual Excel file containing form
+                                  configuration information. Essentially controls the schema of the database table and ORM,
         
+        Returns:
+            A SQLAlchemy db.Model instance (ORM)
+        """
         # Define the default table schema with ID and timestamp fields
         attributes = {
             "__tablename__": config_filename.split('.')[0],
@@ -82,6 +133,7 @@ class MySQLDatastore:
         return type(attributes['__tablename__'].capitalize(), (db.Model,), attributes)
 
     def check_connection(self):
+        """'Check' the existing connection associated with this Datastore instance by opening and closing the configured connection."""
         mysql_config_params = self.config['datastore']['datastore_params']
         self.con = mysql.connector.connect(
                 user=mysql_config_params['mysql_username'],
@@ -92,7 +144,7 @@ class MySQLDatastore:
         self.con.close()
     
     def _refresh_table_schema(self):
-        # Track and auto-apply schema changes using flask-migrate (Alembic)   
+        """Helper function to track and auto-apply schema changes using flask-migrate (Alembic)   """
         with self.app.app_context():
             migrate(message="automigration")
             upgrade()

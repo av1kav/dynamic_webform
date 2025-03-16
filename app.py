@@ -5,6 +5,8 @@ from formbuilder.form_utils import generate_form_html_from_config_file
 from formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
 from utils import read_instance_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
 from datamodels.managers import  DatastoreManager
+from loggers.managers import LoggerManager
+
 from werkzeug.utils import secure_filename
 import os
 
@@ -17,19 +19,23 @@ app = Flask(__name__)
 app.secret_key = config['general']['legacy_flask_app_secret_key']
 # Initialize datastore manager
 datastore = DatastoreManager(app, config)
+# Initialize logging
+app_logger = LoggerManager.get_logger(config)
 
 ## App Routes ##
 @app.route('/')
 def form():
     """
-    Main form-serving page that renders the form template dynamically
+    Main form-serving page that dynamically generates and renders a form.
 
     The page_load_time variable is used to calculate elapsed time, while session_id is
     displayed in an interactable element.
 
-    Methods:
+    Args:
         None
 
+    Returns:
+        None    
     """
     # Refresh the datastore
     datastore.refresh()
@@ -44,13 +50,16 @@ def form():
 @app.route('/submit', methods=['POST'])
 def submit():
     """
-    Form submission route that accepts data into the datastore (UPSERT).
+    Form submission route that accepts data into the datastore (UPSERT by default).
 
     Once form data is extrected from the POST request, additional metadata and validation 
     fields are added and the user is redirected to the 'Thank You' page.
 
-    Methods:
-        POST: Handles the web form 'submit' action and accepts a JSON request containing data.
+    Args:
+        None
+    
+    Returns:
+        None
     """
     if request.method == 'POST':
         # Extract data from the form submission using the defined form schema
@@ -71,6 +80,7 @@ def submit():
         advanced_analytics_form_validation_options = config['advanced_analytics']
         if advanced_analytics_form_validation_options:
             if 'sessiondata' in advanced_analytics_form_validation_options:
+                app_logger.info("Found 'sessiondata' key in config; enabling session metadata recording.")
                 # Session data 
                 _name = request.form.get('_name','Not Enabled') # Honeypot field
                 user_agent = request.headers.get('User-Agent')
@@ -90,8 +100,10 @@ def submit():
                 })
                 submission_data.update(ip_info_check(ip_address))
             if 'L2' in advanced_analytics_form_validation_options:
+                app_logger.info("Found 'L2' key in config; enabling L2 form validation metadata recording.")
                 submission_data.update(l2_validations(submission_data))
             if 'L3' in advanced_analytics_form_validation_options:
+                app_logger.info("Found 'L3' key in config; enabling L3 form validation metadata recording.")
                 submission_data.update(l3_validations(submission_data))
         
         # Save data to datastore
@@ -104,10 +116,14 @@ def submit():
 @app.route('/thank-you')
 def thank_you():
     """
-    Mainly static page that renders after a form is submitted. Sends a reminder email to the applicant's
-    email address, and also reminds the user of the session ID that was just used for submission of the form.
+    Mainly static page that renders after a form is submitted; also sends a reminder email to the applicant's
+    email address if configured to do so. Reminds the user of the session ID that was just used for submission
+    of the form either way, in case the user did not fill out an email address in submission.
 
-    Methods:
+    Args:
+        None
+    
+    Returns:
         None
     """        
     # By default, assume the page is directly being accessed i.e. not from a redirect after a form submission and define the appropriate message
@@ -131,6 +147,15 @@ def thank_you():
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
+    """
+    Login-protected dashboard page for viewing submissions, uploading/downloading data and general management.
+    
+    Args: 
+        None
+    
+    Returns:
+        None
+    """
     df = datastore.read_data()
     formatting_options = {
         'classes': ['table','table-striped', 'table-bordered'],
@@ -162,6 +187,15 @@ def dashboard():
      
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    User authentication app route. Uses session variables to authenticate users.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     if request.method == 'POST':
         password = request.form.get('password')
         if password == config['general']['legacy_dashboard_password']:
@@ -173,12 +207,31 @@ def login():
 
 @app.route('/logout')
 def logout():
+    """
+    Logout app route to remove session authentication variables.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     session.pop('logged_in', None)
     flash("You're no longer signed in.",'info')
     return redirect(url_for('form'))
 
 @app.route('/load_form_data', methods=['POST'])
 def load_form():
+    """
+    App route to populate the fields a rendered form from a record in the database using the session_id as a key. This
+    route is not meant to be accessed directly by the user and is a potential security vulnerability.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     # Pull session ID from request
     session_id = request.json.get("session_id")
     if not session_id:
@@ -191,6 +244,16 @@ def load_form():
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload_file():
+    """
+    App route to handle data uploads into the database. Take caution to ensure the provided file has the correct headers;
+    only valid field names will be ingested while invalid ones will simply be ignored.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
     if request.method == "POST":
         if "file" not in request.files:
             return jsonify({"error": "No file part"}), 400

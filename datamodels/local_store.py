@@ -2,13 +2,15 @@ import pandas as pd
 import os
 
 class ParquetLocalDataStore:
-
+    """
+    Base class (deprecated) for local file storage (no, not a SQLite DB, an actual file)
+    """
     def __init__(self):
-        pass
+        raise DeprecationWarning("This class is not meant to be used in a production environment.")
     
     def append_or_update_data_to_local_store(self, data, config, format='parquet'):
         """
-        Handle an UPSERT operation into local store data.
+        (Deprecated) Handle an UPSERT operation into local store data.
 
         This method defines UPSERT behavior of a new record, called 
         'data', into the local store of the specified data type. The current
@@ -49,7 +51,7 @@ class ParquetLocalDataStore:
 
     def read_local_store_data(self, config):
         """
-        Read data from the local datastore and return it as a Pandas DataFrame.
+        (Deprecated) Read data from the local datastore and return it as a Pandas DataFrame.
 
         Args:
             None
