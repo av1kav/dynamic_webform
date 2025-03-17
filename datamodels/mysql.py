@@ -58,8 +58,10 @@ class MySQLDatastore:
         mysql_config_params = self.config['datastore']['datastore_params']
         self.sqlalchemy_database_uri = self.generate_database_uri_from_config(mysql_config_params=mysql_config_params)
         self.app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_database_uri
+        self.logger.info(f"Added SQLAlchemy URI to app config")
         for key, value in mysql_config_params.get('mysql_sqlalchemy_engine_options',{}).items():
             app.config[key] = value
+            self.logger.info(f"Added {key}={value} to app config")
         
         # Initialize the ORM engine and track schema modifications
         self.db.init_app(self.app)
@@ -92,7 +94,6 @@ class MySQLDatastore:
             hostname=mysql_config_params['mysql_hostname'],
             databasename=mysql_config_params['mysql_database']
         )
-        self.logger.info(f"Generated SQLAlchemy URI: {SQLALCHEMY_DATABASE_URI}")
         return SQLALCHEMY_DATABASE_URI
     
     def generate_table_orm_from_config_file(self, config_folder='formbuilder',config_filename='wny_config.xlsx'):

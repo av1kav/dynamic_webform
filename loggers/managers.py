@@ -1,5 +1,6 @@
 import logging.config
 import os 
+from abc import abstractmethod
 
 class BaseLoggerManager:
     """
@@ -29,10 +30,17 @@ class LoggerManager(BaseLoggerManager):
     """
     _logger_instance = None
     @classmethod
+    @abstractmethod
     def get_logger(cls, config=None):
         """
         Return a singleton logger instance if configured, otherwise configure a new logger 
-        using the config, save it and return it.
+        and handlers based on the provided config and return it.
+
+        Args:
+            config(dict): (Optional, default=None) An optional kwarg which should be supplied
+            the instance configuration dict only once - when first setting up the LoggerManager.
+
+            This is a singleton classmethod - do not instantiate this class as an object.
         """
         if not cls._logger_instance:
             cls.config = config
@@ -42,5 +50,9 @@ class LoggerManager(BaseLoggerManager):
             os.makedirs(cls.log_dir, exist_ok=True)
             logging.config.dictConfig(cls.logging_dictConfig)
             cls._logger_instance = logging.getLogger(cls.logger_name)
+            cls._logger_instance.info(f"App Logger '{cls.logger_name}' initialized with handlers: {cls._logger_instance.handlers}")
+            cls._logger_instance.debug("Available Handlers:")
+            for name, logger in logging.root.manager.loggerDict.items():
+                cls._logger_instance.debug(f"Logger: {name}, Level: {getattr(logger, 'level', 'Not Set')}")
         return cls._logger_instance
-            
+
