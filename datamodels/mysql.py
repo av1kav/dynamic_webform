@@ -66,8 +66,8 @@ class MySQLDatastore:
         # Initialize the ORM engine and track schema modifications
         self.db.init_app(self.app)
         self.migrate.init_app(self.app, self.db)
-        if not os.path.exists('migrations'):
-            self.logger.info('Initial setup, no migrations folder found. Creating new MySQL table.')
+        if not os.path.exists(os.path.join('migrations','script.py.mako')):
+            self.logger.info('Initial setup, no migrations found. Creating new MySQL table from form_config Excel sheet.')
             with self.app.app_context():
                 self.db.create_all()
                 init()
@@ -218,6 +218,7 @@ class MySQLDatastore:
             if id:
                 query = query.filter_by(id=id)
             df = pd.read_sql(query.statement, con=self.engine)
+            # Drop SQLAlchemy-specific metadata
             if '_sa_instance_state' in df.columns:
                 df = df.drop(columns=["_sa_instance_state"])
             return df
