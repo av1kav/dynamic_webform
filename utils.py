@@ -1,3 +1,18 @@
+"""
+utils.py
+=========
+
+This module provides utility functions, primarily for web-related operations.
+
+Example:
+    >>> from utils import is_valid_filename
+    >>> is_valid_filename('abcnotafilename')
+    False
+
+When contributing to this module, ensure to write proper Google-style docstrings.
+
+"""
+
 from flask import request, redirect, url_for, send_file, flash
 from bs4 import BeautifulSoup
 import os
@@ -9,7 +24,7 @@ import pandas as pd
 import yaml
 import io
 
-from loggers.managers import LoggerManager
+from .loggers.managers import LoggerManager
 
 def download_datastore_in_specific_format(datastore, target_format):
     """
@@ -17,8 +32,7 @@ def download_datastore_in_specific_format(datastore, target_format):
 
     Args:
         datastore(datamodels.DatastoreManager): A DatastoreManager object configured with a backend Datastore.
-        target_format(str): One of 'excel', 'parquet', 'json'. Specifies the format in which the datastore's contents 
-                            should be downloaded. Ensure page JS specifies one of the keys above in any AJAX calls.
+        target_format(str): One of 'excel', 'parquet', 'json'. Specifies the format in which the datastore's contents should be downloaded. Ensure page JS specifies one of the keys above in any AJAX calls.
     
     Returns:
         A Flask URL redirect to the dashboard page.
@@ -52,9 +66,13 @@ def read_instance_config(config_folder='config', config_file_name='config.yaml')
     Returns:
         A dictionary containing all configuration information in the YAML file.
     """
-    with open(os.path.join(config_folder,config_file_name)) as handle:
+    
+    # Sphinx gods, look at the trouble you've caused
+    current_folder = os.path.dirname(os.path.abspath(__file__))
+    relative_config_file_path = os.path.join(current_folder,config_folder,config_file_name)
+    with open(relative_config_file_path) as handle:
         config = yaml.safe_load(handle)
-    # TODO: Ensure critical keys available in dict
+    ## TODO: Ensure critical keys available in dict
     return config
 
 def read_uploaded_dataset(file_path, config):
@@ -102,6 +120,7 @@ def generate_websafe_session_id(size=8):
     Returns:
         A generated hexadecimal string of the specified size. 
     """
+
     logger = LoggerManager.get_logger()
     if size < 8:
         logger.warning(f"The 'size' parameter provided to the generate_websafe_session_id method is less than {size}. For safety and stability, this value will be ignored and the default value of {size} will be used.")
@@ -116,6 +135,7 @@ def scrape_form_content(config_dict):
         config_dict(dict): A helper configuration dict containing the following keys:
             1. form_id: The value of the HTML 'id' element in the <form> definition of the webform
             2. form_html_file: The name of the source file containing the (static) form HTML
+    
     Returns:
         Form content parsed into a JSON document in the following format:
         [ 
@@ -128,8 +148,7 @@ def scrape_form_content(config_dict):
                     'select-options': [
                         {'backend_value': '', 'display_text': ''},
                     ]
-                },
-                ...    
+                },    
             ]
     """
 
@@ -181,8 +200,7 @@ def generate_html_table_using_form_content_html(form_content):
                     'select-options': [
                         {'backend_value': '', 'display_text': ''},
                     ]
-                },
-                ...    
+                },  
             ]
             that is generated using the scrape_form_content function.
     Returns:
@@ -252,6 +270,7 @@ def ip_info_check(ip_address, form_validation_options):
     Returns:
         A dict containing all metadata fron the IPInfo service for the specified IP
     """
+
     logger = LoggerManager.get_logger()
     access_token = form_validation_options['sessiondata'].get('ipinfo_token')
     if access_token:

@@ -27,8 +27,10 @@ class LoggerManager(BaseLoggerManager):
 
     Attributes:
         _logger_instance: The singleton logger instance that is configured only once.
+        :meta private:
     """
-    _logger_instance = None
+    __logger_instance = None
+
     @classmethod
     @abstractmethod
     def get_logger(cls, config=None):
@@ -42,17 +44,17 @@ class LoggerManager(BaseLoggerManager):
 
             This is a singleton classmethod - do not instantiate this class as an object.
         """
-        if not cls._logger_instance:
+        if not cls.__logger_instance and config:
             cls.config = config
             cls.logging_dictConfig = cls.config['system']['logging']
             cls.logger_name = next(iter(cls.logging_dictConfig['loggers'].keys()))
             cls.log_dir = cls.logging_dictConfig['log_dir']
             os.makedirs(cls.log_dir, exist_ok=True)
             logging.config.dictConfig(cls.logging_dictConfig)
-            cls._logger_instance = logging.getLogger(cls.logger_name)
-            cls._logger_instance.info(f"App Logger '{cls.logger_name}' initialized with handlers: {cls._logger_instance.handlers}")
-            cls._logger_instance.debug("Available Handlers:")
+            cls.__logger_instance = logging.getLogger(cls.logger_name)
+            cls.__logger_instance.info(f"App Logger '{cls.logger_name}' initialized with handlers: {cls.__logger_instance.handlers}")
+            cls.__logger_instance.debug("Available Handlers:")
             for name, logger in logging.root.manager.loggerDict.items():
-                cls._logger_instance.debug(f"Logger: {name}, Level: {getattr(logger, 'level', 'Not Set')}")
-        return cls._logger_instance
+                cls.__logger_instance.debug(f"Logger: {name}, Level: {getattr(logger, 'level', 'Not Set')}")
+        return cls.__logger_instance
 

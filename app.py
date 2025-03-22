@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from datetime import datetime
 import platform
-from formbuilder.form_utils import generate_form_html_from_config_file
-from formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
-from utils import read_instance_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
-from datamodels.managers import  DatastoreManager
-from loggers.managers import LoggerManager
-import logging
+from .formbuilder.form_utils import generate_form_html_from_config_file
+from .formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
+from .utils import read_instance_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
+from .datamodels.managers import  DatastoreManager
+from .loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
 import os
 
@@ -16,7 +15,7 @@ config = read_instance_config(config_folder='config', config_file_name='config.y
 form_schema = generate_schema_from_config_file(config_folder=os.path.join('config',config['form']['form_config_folder']),config_filename=config['form']['form_config_file_name'])
 # Initialize logging
 app_logger = LoggerManager.get_logger(config)
- 
+
 # Define Flask app and set app-level configs
 app = Flask(__name__) 
 app.secret_key = config['general']['legacy_flask_app_secret_key']

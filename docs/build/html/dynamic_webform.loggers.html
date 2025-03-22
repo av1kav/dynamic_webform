@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>dynamic_webform.loggers package &#8212; dynamic_webform 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=2709fde1"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="dynamic_webform.formbuilder package" href="dynamic_webform.formbuilder.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="dynamic-webform-loggers-package">
+<h1>dynamic_webform.loggers package<a class="headerlink" href="#dynamic-webform-loggers-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-dynamic_webform.loggers.managers">
+<span id="dynamic-webform-loggers-managers-module"></span><h2>dynamic_webform.loggers.managers module<a class="headerlink" href="#module-dynamic_webform.loggers.managers" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamic_webform.loggers.managers.</span></span><span class="sig-name descname"><span class="pre">BaseLoggerManager</span></span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract singleton base class for Loggers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager.critical">
+<span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager.critical" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager.debug" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager.error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager.get_logger">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_logger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager.get_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Return a singleton logger instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager.info" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.BaseLoggerManager.warning">
+<span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.BaseLoggerManager.warning" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamic_webform.loggers.managers.</span></span><span class="sig-name descname"><span class="pre">LoggerManager</span></span><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dynamic_webform.loggers.managers.BaseLoggerManager" title="dynamic_webform.loggers.managers.BaseLoggerManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseLoggerManager</span></code></a></p>
+<p>Singleton class for Logging management. Thread-safe and production-capable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager._logger_instance">
+<span class="sig-name descname"><span class="pre">_logger_instance</span></span><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager._logger_instance" title="Link to this definition">¶</a></dt>
+<dd><p>The singleton logger instance that is configured only once.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'advanced_analytics':</span> <span class="pre">None,</span> <span class="pre">'datastore':</span> <span class="pre">{'data_upload':</span> <span class="pre">{'allowed_formats':</span> <span class="pre">['csv',</span> <span class="pre">'xlsx'],</span> <span class="pre">'data_upload_folder':</span> <span class="pre">'upload'},</span> <span class="pre">'datastore_params':</span> <span class="pre">{'mysql_database':</span> <span class="pre">'webformdata',</span> <span class="pre">'mysql_hostname':</span> <span class="pre">'127.0.0.1',</span> <span class="pre">'mysql_password':</span> <span class="pre">'password',</span> <span class="pre">'mysql_sqlalchemy_engine_options':</span> <span class="pre">{'SQLALCHEMY_POOL_RECYCLE':</span> <span class="pre">299,</span> <span class="pre">'SQLALCHEMY_TRACK_MODIFICATIONS':</span> <span class="pre">False},</span> <span class="pre">'mysql_username':</span> <span class="pre">'root'},</span> <span class="pre">'datastore_type':</span> <span class="pre">'mysql'},</span> <span class="pre">'email':</span> <span class="pre">{'provider':</span> <span class="pre">{'api_key':</span> <span class="pre">'b140aa4512b0f773934fe93e7638c67f-ac3d5f74-c3908c9b',</span> <span class="pre">'http_service_api_url':</span> <span class="pre">'https://api.mailgun.net/v3/sandboxf7cf6f2359994397ab1b7a150ce5c6fa.mailgun.org/messages',</span> <span class="pre">'provider_name':</span> <span class="pre">'mailgun',</span> <span class="pre">'service_protocol':</span> <span class="pre">'http'},</span> <span class="pre">'sender_address':</span> <span class="pre">'UB</span> <span class="pre">RA</span> <span class="pre">Web</span> <span class="pre">Form</span> <span class="pre">Admin</span> <span class="pre">&lt;mailgun&#64;sandboxf7cf6f2359994397ab1b7a150ce5c6fa.mailgun.org&gt;'},</span> <span class="pre">'form':</span> <span class="pre">{'form_config_file_name':</span> <span class="pre">'form.xlsx',</span> <span class="pre">'form_config_folder':</span> <span class="pre">'form_config',</span> <span class="pre">'form_type':</span> <span class="pre">'dynamic'},</span> <span class="pre">'general':</span> <span class="pre">{'instance_name':</span> <span class="pre">'UB_RA_WebForm',</span> <span class="pre">'legacy_dashboard_password':</span> <span class="pre">'UBMFG',</span> <span class="pre">'legacy_flask_app_secret_key':</span> <span class="pre">'822-342-473',</span> <span class="pre">'project_domains':</span> <span class="pre">['EV',</span> <span class="pre">'Semicondictor</span> <span class="pre">Manufacturing'],</span> <span class="pre">'roles':</span> <span class="pre">[{'admin':</span> <span class="pre">['admin']},</span> <span class="pre">{'viewer':</span> <span class="pre">['analyst_user']}],</span> <span class="pre">'users':</span> <span class="pre">['admin',</span> <span class="pre">'analyst_user'],</span> <span class="pre">'websafe_session_id_size':</span> <span class="pre">8},</span> <span class="pre">'system':</span> <span class="pre">{'logging':</span> <span class="pre">{'disable_existing_loggers':</span> <span class="pre">False,</span> <span class="pre">'formatters':</span> <span class="pre">{'general':</span> <span class="pre">{'datefmt':</span> <span class="pre">'%Y-%m-%dT%H:%M:%S%z',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">%(levelname)-8s</span> <span class="pre">%(funcName)s()</span> <span class="pre">%(module)s.py</span> <span class="pre">L%(lineno)d:</span> <span class="pre">%(message)s]'}},</span> <span class="pre">'handlers':</span> <span class="pre">{'stderr':</span> <span class="pre">{'class':</span> <span class="pre">'logging.StreamHandler',</span> <span class="pre">'formatter':</span> <span class="pre">'general',</span> <span class="pre">'level':</span> <span class="pre">'INFO',</span> <span class="pre">'stream':</span> <span class="pre">'ext://sys.stderr'}},</span> <span class="pre">'log_dir':</span> <span class="pre">'logs',</span> <span class="pre">'loggers':</span> <span class="pre">{'app':</span> <span class="pre">{'handlers':</span> <span class="pre">['stderr'],</span> <span class="pre">'level':</span> <span class="pre">'INFO',</span> <span class="pre">'propagate':</span> <span class="pre">False}},</span> <span class="pre">'root':</span> <span class="pre">{'handlers':</span> <span class="pre">['stderr'],</span> <span class="pre">'level':</span> <span class="pre">'INFO'},</span> <span class="pre">'version':</span> <span class="pre">1}}}</span></em><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager.config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager.get_logger">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager.get_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Return a singleton logger instance if configured, otherwise configure a new logger
+and handlers based on the provided config and return it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>dict</em>) – (Optional, default=None) An optional kwarg which should be supplied</p></li>
+<li><p><strong>LoggerManager.</strong> (<em>the instance configuration dict only once - when first setting up the</em>)</p></li>
+<li><p><strong>object.</strong> (<em>This is a singleton classmethod - do not instantiate this class as an</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager.log_dir">
+<span class="sig-name descname"><span class="pre">log_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'logs'</span></em><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager.log_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager.logger_name">
+<span class="sig-name descname"><span class="pre">logger_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'app'</span></em><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager.logger_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dynamic_webform.loggers.managers.LoggerManager.logging_dictConfig">
+<span class="sig-name descname"><span class="pre">logging_dictConfig</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'disable_existing_loggers':</span> <span class="pre">False,</span> <span class="pre">'formatters':</span> <span class="pre">{'general':</span> <span class="pre">{'datefmt':</span> <span class="pre">'%Y-%m-%dT%H:%M:%S%z',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">%(levelname)-8s</span> <span class="pre">%(funcName)s()</span> <span class="pre">%(module)s.py</span> <span class="pre">L%(lineno)d:</span> <span class="pre">%(message)s]'}},</span> <span class="pre">'handlers':</span> <span class="pre">{'stderr':</span> <span class="pre">{'class':</span> <span class="pre">'logging.StreamHandler',</span> <span class="pre">'formatter':</span> <span class="pre">'general',</span> <span class="pre">'level':</span> <span class="pre">'INFO',</span> <span class="pre">'stream':</span> <span class="pre">'ext://sys.stderr'}},</span> <span class="pre">'log_dir':</span> <span class="pre">'logs',</span> <span class="pre">'loggers':</span> <span class="pre">{'app':</span> <span class="pre">{'handlers':</span> <span class="pre">['stderr'],</span> <span class="pre">'level':</span> <span class="pre">'INFO',</span> <span class="pre">'propagate':</span> <span class="pre">False}},</span> <span class="pre">'root':</span> <span class="pre">{'handlers':</span> <span class="pre">['stderr'],</span> <span class="pre">'level':</span> <span class="pre">'INFO'},</span> <span class="pre">'version':</span> <span class="pre">1}</span></em><a class="headerlink" href="#dynamic_webform.loggers.managers.LoggerManager.logging_dictConfig" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamic_webform.loggers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dynamic_webform.loggers" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">dynamic_webform</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dynamic_webform.html">dynamic_webform package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dynamic_webform.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_webform.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_webform.html#module-dynamic_webform.app">dynamic_webform.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_webform.html#module-dynamic_webform.utils">dynamic_webform.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_webform.html#module-dynamic_webform">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="dynamic_webform.html">dynamic_webform package</a><ul>
+      <li>Previous: <a href="dynamic_webform.formbuilder.html" title="previous chapter">dynamic_webform.formbuilder package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Avinash Venugopal.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/dynamic_webform.loggers.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

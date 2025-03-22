@@ -34,8 +34,10 @@ def generate_schema_from_config_file(config_folder='formbuilder',config_filename
         A dictionary with keys corresponding to backend_field_names and values of None to use as a data collection template for 
         form submissions.
     """
-    config_filepath = os.path.join(config_folder, config_filename)
-    config_workbook = pd.ExcelFile(config_filepath)
+    current_folder = os.path.dirname(os.path.abspath(__file__))    
+    relative_config_file_path = os.path.join(current_folder,'..',config_folder,config_filename)
+    print("RELATIVE PATH", relative_config_file_path)
+    config_workbook = pd.ExcelFile(relative_config_file_path)
     form_pages = pd.read_excel(config_workbook, 'Pages').set_index('page_number').to_dict(orient='index')
     form_fields = pd.read_excel(config_workbook, 'Fields')
     backend_field_names = form_fields['backend_field_name'].to_list()

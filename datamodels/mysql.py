@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, select
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
 from sqlalchemy.dialects.mysql import insert
-from utils import generate_websafe_session_id
+from ..utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
 from flask_migrate import migrate, Migrate, init, upgrade
@@ -10,7 +10,7 @@ import mysql.connector
 import pandas as pd
 import os
 
-from loggers.managers import LoggerManager
+from ..loggers.managers import LoggerManager
 
 SQLALCHEMY_TYPE_MAPPING = {
     "INTEGER": Integer,
@@ -18,8 +18,6 @@ SQLALCHEMY_TYPE_MAPPING = {
     "FLOAT": Float,
     "BOOLEAN": Boolean
 }
-
-db = SQLAlchemy()
 
 class MySQLDatastore:
     """
@@ -47,7 +45,7 @@ class MySQLDatastore:
             None
         """
         self.app = app
-        self.db = db
+        self.db = SQLAlchemy()
         self.config = config
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
@@ -121,15 +119,18 @@ class MySQLDatastore:
 
         # Then build the remainder of the schema dynamically from the form config file
         config_folder = os.path.join('config',config_folder)
-        config_filepath = os.path.join(config_folder, config_filename) if config_folder else config_filename
-        config_workbook = pd.ExcelFile(config_filepath)
+        config_filepath = os.path.join(config_folder, config_filename)
+        current_folder = os.path.dirname(os.path.abspath(__file__))
+        relative_config_file_path = os.path.join(current_folder,'..',config_filepath)
+        config_workbook = pd.ExcelFile(relative_config_file_path)
+
         form_fields = pd.read_excel(config_workbook, 'Fields')
         for _, row in form_fields.iterrows():
             col_name = row["backend_field_name"]
             col_type = SQLALCHEMY_TYPE_MAPPING.get(row["data_type"], String(255))
             nullable = True if row["required"] == 'No' else False
             attributes[col_name] = Column(col_type, nullable=nullable, primary_key=False)
-        return type(attributes['__tablename__'].capitalize(), (db.Model,), attributes)
+        return type(attributes['__tablename__'].capitalize(), (self.db.Model,), attributes)
 
     def check_connection(self):
         """'Check' the existing connection associated with this Datastore instance by opening and closing the configured connection."""

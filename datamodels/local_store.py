@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from loggers.managers import LoggerManager
+from ..loggers.managers import LoggerManager
 
 class ParquetLocalDataStore:
     """
