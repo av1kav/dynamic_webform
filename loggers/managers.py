@@ -23,13 +23,14 @@ class BaseLoggerManager:
     
 class LoggerManager(BaseLoggerManager):
     """
-    Singleton class for Logging management. Thread-safe and production-capable.
+    Singleton class for Logging management; thread-safe and production-capable. Sphinx
+    autodoc will set various class variables
 
     Attributes:
-        _logger_instance: The singleton logger instance that is configured only once.
-        :meta private:
+        __logger_instance: The singleton logger instance that is configured only once.
+        logger_name: The name of the logger, configured in the instance config YAML.
+        log_dir: (Experimental) The directory used for storing log output for any file-based handlers
     """
-    __logger_instance = None
 
     @classmethod
     @abstractmethod
@@ -45,12 +46,11 @@ class LoggerManager(BaseLoggerManager):
             This is a singleton classmethod - do not instantiate this class as an object.
         """
         if not cls.__logger_instance and config:
-            cls.config = config
-            cls.logging_dictConfig = cls.config['system']['logging']
-            cls.logger_name = next(iter(cls.logging_dictConfig['loggers'].keys()))
-            cls.log_dir = cls.logging_dictConfig['log_dir']
+            logging_dictConfig = config['system']['logging']
+            cls.logger_name = next(iter(logging_dictConfig['loggers'].keys()))
+            cls.log_dir = logging_dictConfig['log_dir']
             os.makedirs(cls.log_dir, exist_ok=True)
-            logging.config.dictConfig(cls.logging_dictConfig)
+            logging.config.dictConfig(logging_dictConfig)
             cls.__logger_instance = logging.getLogger(cls.logger_name)
             cls.__logger_instance.info(f"App Logger '{cls.logger_name}' initialized with handlers: {cls.__logger_instance.handlers}")
             cls.__logger_instance.debug("Available Handlers:")

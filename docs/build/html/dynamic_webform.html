@@ -62,6 +62,8 @@
 <li class="toctree-l3"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager"><code class="docutils literal notranslate"><span class="pre">DatastoreManager</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.add_bulk_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.add_bulk_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.add_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.add_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.check_connection"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.check_connection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.delete_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.delete_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.read_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.read_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.refresh"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.refresh()</span></code></a></li>
 </ul>
@@ -109,7 +111,10 @@
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.formbuilder.html#dynamic_webform.formbuilder.schema_utils.BaseFileSchema.fields"><code class="docutils literal notranslate"><span class="pre">BaseFileSchema.fields</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="dynamic_webform.formbuilder.html#dynamic_webform.formbuilder.schema_utils.ExcelFileSchema"><code class="docutils literal notranslate"><span class="pre">ExcelFileSchema</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamic_webform.formbuilder.html#dynamic_webform.formbuilder.schema_utils.ExcelFileSchema"><code class="docutils literal notranslate"><span class="pre">ExcelFileSchema</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.formbuilder.html#dynamic_webform.formbuilder.schema_utils.ExcelFileSchema.fields"><code class="docutils literal notranslate"><span class="pre">ExcelFileSchema.fields</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="dynamic_webform.formbuilder.html#dynamic_webform.formbuilder.schema_utils.extract_form_response_data_using_schema"><code class="docutils literal notranslate"><span class="pre">extract_form_response_data_using_schema()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dynamic_webform.formbuilder.html#dynamic_webform.formbuilder.schema_utils.generate_schema_from_config_file"><code class="docutils literal notranslate"><span class="pre">generate_schema_from_config_file()</span></code></a></li>
 </ul>
@@ -130,12 +135,15 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager"><code class="docutils literal notranslate"><span class="pre">LoggerManager</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager._logger_instance"><code class="docutils literal notranslate"><span class="pre">LoggerManager._logger_instance</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.config"><code class="docutils literal notranslate"><span class="pre">LoggerManager.config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.get_logger"><code class="docutils literal notranslate"><span class="pre">LoggerManager.get_logger()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.log_dir"><code class="docutils literal notranslate"><span class="pre">LoggerManager.log_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.__logger_instance"><code class="docutils literal notranslate"><span class="pre">LoggerManager.__logger_instance</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.logger_name"><code class="docutils literal notranslate"><span class="pre">LoggerManager.logger_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.logging_dictConfig"><code class="docutils literal notranslate"><span class="pre">LoggerManager.logging_dictConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.log_dir"><code class="docutils literal notranslate"><span class="pre">LoggerManager.log_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.critical"><code class="docutils literal notranslate"><span class="pre">LoggerManager.critical()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.debug"><code class="docutils literal notranslate"><span class="pre">LoggerManager.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.error"><code class="docutils literal notranslate"><span class="pre">LoggerManager.error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.get_logger"><code class="docutils literal notranslate"><span class="pre">LoggerManager.get_logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.info"><code class="docutils literal notranslate"><span class="pre">LoggerManager.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.warning"><code class="docutils literal notranslate"><span class="pre">LoggerManager.warning()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -149,128 +157,8 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="module-dynamic_webform.app">
-<span id="dynamic-webform-app-module"></span><h2>dynamic_webform.app module<a class="headerlink" href="#module-dynamic_webform.app" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.dashboard">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">dashboard</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.dashboard" title="Link to this definition">¶</a></dt>
-<dd><p>Login-protected dashboard page for viewing submissions, uploading/downloading data and general management.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.form">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.form" title="Link to this definition">¶</a></dt>
-<dd><p>Main form-serving page that dynamically generates and renders a form.</p>
-<p>The page_load_time variable is used to calculate elapsed time, while session_id is
-displayed in an interactable element.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.load_form">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">load_form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.load_form" title="Link to this definition">¶</a></dt>
-<dd><p>App route to populate the fields a rendered form from a record in the database using the session_id as a key. This
-route is not meant to be accessed directly by the user and is a potential security vulnerability.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.login">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.login" title="Link to this definition">¶</a></dt>
-<dd><p>User authentication app route. Uses session variables to authenticate users.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.logout">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.logout" title="Link to this definition">¶</a></dt>
-<dd><p>Logout app route to remove session authentication variables.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.submit">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.submit" title="Link to this definition">¶</a></dt>
-<dd><p>Form submission route that accepts data into the datastore (UPSERT by default).</p>
-<p>Once form data is extrected from the POST request, additional metadata and validation
-fields are added and the user is redirected to the ‘Thank You’ page.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.thank_you">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">thank_you</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.thank_you" title="Link to this definition">¶</a></dt>
-<dd><p>Mainly static page that renders after a form is submitted; also sends a reminder email to the applicant’s
-email address if configured to do so. Reminds the user of the session ID that was just used for submission
-of the form either way, in case the user did not fill out an email address in submission.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamic_webform.app.upload_file">
-<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">upload_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.upload_file" title="Link to this definition">¶</a></dt>
-<dd><p>App route to handle data uploads into the database. Take caution to ensure the provided file has the correct headers;
-only valid field names will be ingested while invalid ones will simply be ignored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong></p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="dynamic-webform-app-module">
+<h2>dynamic_webform.app module<a class="headerlink" href="#dynamic-webform-app-module" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-dynamic_webform.utils">
 <span id="dynamic-webform-utils-module"></span><h2>dynamic_webform.utils module<a class="headerlink" href="#module-dynamic_webform.utils" title="Link to this heading">¶</a></h2>
@@ -603,7 +491,7 @@ this utility function.</p>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">dynamic_webform package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-dynamic_webform.app">dynamic_webform.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamic-webform-app-module">dynamic_webform.app module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dynamic_webform.utils">dynamic_webform.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dynamic_webform">Module contents</a></li>
 </ul>
