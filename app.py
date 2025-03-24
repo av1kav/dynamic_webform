@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask_login import LoginManager, login_user, logout_user, login_required
 from datetime import datetime
 import platform
 from .formbuilder.form_utils import generate_form_html_from_config_file
 from .formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
-from .utils import read_instance_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
+from .utils import User, role_required
+from .utils import read_instance_config, parse_user_auth_info_from_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
 from .datamodels.managers import  DatastoreManager
 from .loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
@@ -13,15 +15,32 @@ import os
 # Read instance config YAML and form schema
 config = read_instance_config(config_folder='config', config_file_name='config.yaml')
 form_schema = generate_schema_from_config_file(config_folder=os.path.join('config',config['form']['form_config_folder']),config_filename=config['form']['form_config_file_name'])
+
 # Initialize logging
 app_logger = LoggerManager.get_logger(config)
 
 # Define Flask app and set app-level configs
 app = Flask(__name__) 
-app.secret_key = config['general']['legacy_flask_app_secret_key']
+app.secret_key = config['general']['flask_app_secret_key']
+
 # Initialize datastore manager
 datastore = DatastoreManager(app, config)
 
+# Initialize login manager and authentication functions
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message_category = "warning"
+user_auth_info = parse_user_auth_info_from_config(config)
+
+@login_manager.user_loader
+def load_user(user_id):
+    """
+    This function is here because it needs an instantiated LoginManager.
+    """
+    if user_id in user_auth_info:
+        return User(**user_auth_info[user_id])
+    
 ## App Routes ##
 @app.route('/')
 def form():
@@ -145,10 +164,75 @@ def thank_you():
     
     return render_template('thank_you.html', session_id=session_id, message=message)
 
+@app.route('/load_form_data', methods=['POST'])
+def load_form():
+    """
+    App route to populate the fields a rendered form from a record in the database using the session_id as a key. This
+    route is not meant to be accessed directly by the user and is a potential security vulnerability.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+    # Pull session ID from request
+    session_id = request.json.get("session_id")
+    if not session_id:
+        return jsonify({"error": "No session code provided."}), 400
+    # Retrieve data for the specified session_id, or return 404
+    df = datastore.read_data(id=session_id)
+    if df.empty:
+        return jsonify({"error": "Session code not found."}), 404
+    return df.to_dict(orient="records")[0]
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """
+    User authentication app route. Uses flask-login management to authenticate users
+    based on the credential values configured in the instance configuration YAML.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+    if request.method == 'POST':
+        print(request.form)
+        username = str(request.form.get('username'))
+        password = str(request.form.get('password'))
+        print('authenticating:', username, password)
+        print(user_auth_info)
+        if username in user_auth_info and user_auth_info[username]['password'] == password:
+            current_user = load_user(username)
+            login_user(current_user)
+            return redirect(url_for('dashboard'))            
+        else:
+            flash('Incorrect password. Please try again.','danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """
+    Logout app route to remove session authentication variables.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+    logout_user()
+    flash("You have been logged out.",'info')
+    return redirect(url_for('login'))
+
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
     """
-    Login-protected dashboard page for viewing submissions, uploading/downloading data and general management.
+    Login-protected dashboard page for viewing submissions, uploading/downloading data and general 
+    management. Some features/functions will be enabled only if roles permit.
     
     Args: 
         None
@@ -178,71 +262,12 @@ def dashboard():
                 # Key "format" does NOT exist, so return the appropriate response
                 flash('Incorrect password. Please try again.','danger')
                 return redirect(url_for('login'))
-    
-    # Redirect the user to log in if they aren't logged in   
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
 
     return render_template('dashboard.html', form_submissions=df.to_html(**formatting_options))
-     
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """
-    User authentication app route. Uses session variables to authenticate users.
-
-    Args:
-        None
-    
-    Returns:
-        None
-    """
-    if request.method == 'POST':
-        password = request.form.get('password')
-        if password == config['general']['legacy_dashboard_password']:
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Incorrect password. Please try again.','danger')
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    """
-    Logout app route to remove session authentication variables.
-
-    Args:
-        None
-    
-    Returns:
-        None
-    """
-    session.pop('logged_in', None)
-    flash("You're no longer signed in.",'info')
-    return redirect(url_for('form'))
-
-@app.route('/load_form_data', methods=['POST'])
-def load_form():
-    """
-    App route to populate the fields a rendered form from a record in the database using the session_id as a key. This
-    route is not meant to be accessed directly by the user and is a potential security vulnerability.
-
-    Args:
-        None
-    
-    Returns:
-        None
-    """
-    # Pull session ID from request
-    session_id = request.json.get("session_id")
-    if not session_id:
-        return jsonify({"error": "No session code provided."}), 400
-    # Retrieve data for the specified session_id, or return 404
-    df = datastore.read_data(id=session_id)
-    if df.empty:
-        return jsonify({"error": "Session code not found."}), 404
-    return df.to_dict(orient="records")[0]
 
 @app.route("/upload", methods=["GET", "POST"])
+@login_required
+@role_required(role="admin")
 def upload_file():
     """
     App route to handle data uploads into the database. Take caution to ensure the provided file has the correct headers;

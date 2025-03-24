@@ -9,22 +9,35 @@
     <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/styles.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
 </head>
-<body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<body>    
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Dashboard</a>
+            <div class="ml-auto">
+                {% if current_user.is_authenticated %}
+                    <span class="navbar-text text-muted">
+                        Welcome, <strong>{{ current_user.display_name }}</strong> ({{ current_user.role }}) <a href="{{ url_for('logout') }}" title="Log Out"><i class="bi bi-box-arrow-right text-muted"></i></a>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <!-- Content -->
     <div class="container">
         <div class="text-left mt-5 mb-4">
-            <h1>Dashboard</h1>
-            <p class="text-muted">Dashboard for basic analytics and viewing submissions.</p>
+            <h2>Analytics</h1>
+            <p class="text-muted">Basic analytics for existing submissions.</p>
         </div>
     </div>
-    <div class="container my-5">
+    <div class="container my-1">
         <h2>Submission History</h2>
         <div class="d-flex justify-content-end">
             <button onclick="downloadFile('excel')" title="Download as Excel" class="btn btn-light rounded-0"><i class="bi bi-filetype-xls"></i></button>
             <button onclick="downloadFile('parquet')" title="Download as Parquet" class="btn btn-light rounded-0"><i class="bi bi-file-zip"></i></button>
             <button onclick="downloadFile('json')" title="Download as JSON" class="btn btn-light rounded-0"><i class="bi bi-filetype-json"></i></button>
         </div>
-        <div class="table-container mb-5 p-3 bg-light rounded" style="overflow-x: scroll;">
+        <div class="table-container mb-3 p-3 bg-light rounded" style="overflow-x: scroll;">
             <!-- Form submission table --> 
             {{ form_submissions | safe }}
         </div>
@@ -45,13 +58,11 @@
                     </a>
                     <br>
                 </div>
-
                 <!-- Footer Disclaimers -->
                 <div class="col-md-4 mb-3">
                     <h6 class="text-uppercase fw-bold">Disclaimer</h6>
                     <p class="small">This website collects session information. Use of this site is subject to UB's <a class="text-white" href="//www.buffalo.edu/administrative-services/policy1/ub-policy-lib/privacy.html">Privacy Policy</a>.</p>
                 </div>
-
                 <!-- Footer Contact Info -->
                 <div class="col-md-4 mb-3">
                     <h6 class="text-uppercase fw-bold">Contact Us</h6>
@@ -61,7 +72,6 @@
                     </p>
                 </div>
             </div>
-
             <!-- Copyright -->
             <div class="row">
                 <div class="col-12 mt-3">

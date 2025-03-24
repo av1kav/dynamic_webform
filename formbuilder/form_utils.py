@@ -97,8 +97,9 @@ def generate_html_for_input_group_end():
 def generate_form_html_from_config_file(config_folder='formbuilder',config_filename='wny_config.xlsx'):
     logger = LoggerManager.get_logger()
     logger.info(f"Attempting to generate form HTML using config file configured at {config_folder}/{config_filename}")
-    config_filepath = os.path.join(config_folder, config_filename) if config_folder else config_filename
-    config_workbook = pd.ExcelFile(config_filepath)
+    current_folder = os.path.dirname(os.path.abspath(__file__))
+    relative_config_file_path = os.path.join(current_folder,'..',config_folder,config_filename)    
+    config_workbook = pd.ExcelFile(relative_config_file_path)
     form_pages = pd.read_excel(config_workbook, 'Pages').set_index('page_number').to_dict(orient='index')
     form_fields = pd.read_excel(config_workbook, 'Fields')
     generated_form_html = """"""

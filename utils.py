@@ -2,7 +2,7 @@
 utils.py
 =========
 
-This module provides utility functions, primarily for web-related operations.
+This module provides utility classes and functions, primarily for web-related operations.
 
 Example:
     >>> from utils import is_valid_filename
@@ -14,6 +14,8 @@ When contributing to this module, ensure to write proper Google-style docstrings
 """
 
 from flask import request, redirect, url_for, send_file, flash
+from functools import wraps
+from flask_login import UserMixin, current_user, login_required
 from bs4 import BeautifulSoup
 import os
 import hashlib
@@ -25,6 +27,58 @@ import yaml
 import io
 
 from .loggers.managers import LoggerManager
+
+class User(UserMixin):
+    def __init__(self, username, password, role, display_name):
+        self.id = username
+        self.password = password 
+        self.role = role
+        self.display_name = display_name
+
+    def get_id(self):
+        return self.id
+    
+    def is_authenticated(self, user):
+        if user.username == self.id and user.password == self.password:
+            return True
+        return False
+    
+    def is_authorized(self, role):
+        """Implements basic role-based access control."""
+        return self.role == role
+    
+    def is_active(self, user):
+        """
+        Determines if a user is active; Since there is no blacklisting/activation period for
+        this project, any users listed in the instance config YAML are considered active.
+        """
+        return True 
+    
+    def is_anonymous(self, user):
+        """Determines if the user is anonymous; this is not supported."""
+        return False
+
+def parse_user_auth_info_from_config(config):
+    user_info = {}
+    for user, user_config in config['general']['users'].items():
+        user_info[user] = {
+            'username': user,
+            'password': user_config.get('password', 'password'),
+            'role': user_config.get('role', 'viewer'),
+            'display_name': user_config.get('display_name', user)
+        }
+    return user_info
+
+def role_required(role):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if not current_user.is_authorized(role):
+                flash('This page is not accessible based on your current role. Please reach out to the team for questions.', category='warning')
+                return redirect(url_for('login'))
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator   
 
 def download_datastore_in_specific_format(datastore, target_format):
     """
