@@ -4,7 +4,7 @@ import numpy as np
 import os
 from bs4 import BeautifulSoup as soup
 
-from ..loggers.managers import LoggerManager
+from loggers.managers import LoggerManager
 
 def prettify_raw_html(html_string, engine='bs4'):
     """

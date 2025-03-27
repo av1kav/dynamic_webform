@@ -43,7 +43,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="#">Upload</a>
+            <a class="navbar-brand" href="#">SCAN Data Platform</a>
             <div class="ml-auto">
                 {% if current_user.is_authenticated %}
                     <span class="navbar-text text-muted">
@@ -56,13 +56,19 @@
     <div class="container">
         <div class="text-left mt-5 mb-4">
             <h1>Data Upload</h1>
-            <p class="text-muted">Upload a file with a supported format (xlsx, csv) to load it into the datastore.</p>
+            <p class="text-muted">Upload a file/dataset with a supported format (xlsx, csv) to load it into the datastore.</p>
         </div>
-
+        <div class="text-left mt-5 mb-4">
+            <h2>Step 1: Download the current dataset template</h3>
+            <p class="text-muted">Your data will need to match the columns in this file so it can be synced into the data store. You can modify your file manually, or just use this template to do so.</p>
+        </div>
+        <div class="text-left mt-5 mb-4">
+            <h2>Step 2: Upload the filled template</h3>
+            <p class="text-muted">Once your file is fully populated with column headers that match the current template, select your file for upload and hit the "Upload" button below.</p>
+        </div>
         <div id="progress-container">
             <div id="progress-bar"></div>
         </div>
-    
         <div class="container my-3 mx-0 px-0">
             <form id="upload-form" enctype="multipart/form-data">
                 <input type="file" id="file-input" name="file" hidden>

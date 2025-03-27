@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, select
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
 from sqlalchemy.dialects.mysql import insert
-from ..utils import generate_websafe_session_id
+from utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
 from flask_migrate import migrate, Migrate, init, upgrade
@@ -10,7 +10,7 @@ import mysql.connector
 import pandas as pd
 import os
 
-from ..loggers.managers import LoggerManager
+from loggers.managers import LoggerManager
 
 SQLALCHEMY_TYPE_MAPPING = {
     "INTEGER": Integer,

@@ -135,7 +135,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager"><code class="docutils literal notranslate"><span class="pre">LoggerManager</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.__logger_instance"><code class="docutils literal notranslate"><span class="pre">LoggerManager.__logger_instance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager._logger_instance"><code class="docutils literal notranslate"><span class="pre">LoggerManager._logger_instance</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.logger_name"><code class="docutils literal notranslate"><span class="pre">LoggerManager.logger_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.log_dir"><code class="docutils literal notranslate"><span class="pre">LoggerManager.log_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.critical"><code class="docutils literal notranslate"><span class="pre">LoggerManager.critical()</span></code></a></li>
@@ -143,6 +143,8 @@
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.error"><code class="docutils literal notranslate"><span class="pre">LoggerManager.error()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.get_logger"><code class="docutils literal notranslate"><span class="pre">LoggerManager.get_logger()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.info"><code class="docutils literal notranslate"><span class="pre">LoggerManager.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#id0"><code class="docutils literal notranslate"><span class="pre">LoggerManager.log_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#id1"><code class="docutils literal notranslate"><span class="pre">LoggerManager.logger_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.loggers.html#dynamic_webform.loggers.managers.LoggerManager.warning"><code class="docutils literal notranslate"><span class="pre">LoggerManager.warning()</span></code></a></li>
 </ul>
 </li>
@@ -157,14 +159,142 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="dynamic-webform-app-module">
-<h2>dynamic_webform.app module<a class="headerlink" href="#dynamic-webform-app-module" title="Link to this heading">¶</a></h2>
+<section id="module-dynamic_webform.app">
+<span id="dynamic-webform-app-module"></span><h2>dynamic_webform.app module<a class="headerlink" href="#module-dynamic_webform.app" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.dashboard">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">dashboard</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.dashboard" title="Link to this definition">¶</a></dt>
+<dd><p>Login-protected dashboard page for viewing submissions, uploading/downloading data and general
+management. Some features/functions will be enabled only if roles permit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.form">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.form" title="Link to this definition">¶</a></dt>
+<dd><p>Main form-serving page that dynamically generates and renders a form.</p>
+<p>The page_load_time variable is used to calculate elapsed time, while session_id is
+displayed in an interactable element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.load_form">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">load_form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.load_form" title="Link to this definition">¶</a></dt>
+<dd><p>App route to populate the fields a rendered form from a record in the database using the session_id as a key. This
+route is not meant to be accessed directly by the user and is a potential security vulnerability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.load_user">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">load_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.load_user" title="Link to this definition">¶</a></dt>
+<dd><p>This function is here because it needs an instantiated LoginManager.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.login">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.login" title="Link to this definition">¶</a></dt>
+<dd><p>User authentication app route. Uses flask-login management to authenticate users
+based on the credential values configured in the instance configuration YAML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.logout">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.logout" title="Link to this definition">¶</a></dt>
+<dd><p>Logout app route to remove session authentication variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.submit">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.submit" title="Link to this definition">¶</a></dt>
+<dd><p>Form submission route that accepts data into the datastore (UPSERT by default).</p>
+<p>Once form data is extrected from the POST request, additional metadata and validation
+fields are added and the user is redirected to the ‘Thank You’ page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.thank_you">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">thank_you</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.thank_you" title="Link to this definition">¶</a></dt>
+<dd><p>Mainly static page that renders after a form is submitted; also sends a reminder email to the applicant’s
+email address if configured to do so. Reminds the user of the session ID that was just used for submission
+of the form either way, in case the user did not fill out an email address in submission.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.upload_file">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">upload_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.upload_file" title="Link to this definition">¶</a></dt>
+<dd><p>App route to handle data uploads into the database. Take caution to ensure the provided file has the correct headers;
+only valid field names will be ingested while invalid ones will simply be ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-dynamic_webform.utils">
 <span id="dynamic-webform-utils-module"></span><h2>dynamic_webform.utils module<a class="headerlink" href="#module-dynamic_webform.utils" title="Link to this heading">¶</a></h2>
 <section id="utils-py">
 <h3>utils.py<a class="headerlink" href="#utils-py" title="Link to this heading">¶</a></h3>
-<p>This module provides utility functions, primarily for web-related operations.</p>
+<p>This module provides utility classes and functions, primarily for web-related operations.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_valid_filename</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">is_valid_filename</span><span class="p">(</span><span class="s1">&#39;abcnotafilename&#39;</span><span class="p">)</span>
@@ -173,6 +303,41 @@
 </div>
 <p>When contributing to this module, ensure to write proper Google-style docstrings.</p>
 </section>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamic_webform.utils.User">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamic_webform.utils.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.User" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserMixin</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.utils.User.get_id">
+<span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.User.get_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.utils.User.is_active">
+<span class="sig-name descname"><span class="pre">is_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.User.is_active" title="Link to this definition">¶</a></dt>
+<dd><p>Determines if a user is active; Since there is no blacklisting/activation period for
+this project, any users listed in the instance config YAML are considered active.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.utils.User.is_anonymous">
+<span class="sig-name descname"><span class="pre">is_anonymous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.User.is_anonymous" title="Link to this definition">¶</a></dt>
+<dd><p>Determines if the user is anonymous; this is not supported.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.utils.User.is_authenticated">
+<span class="sig-name descname"><span class="pre">is_authenticated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.User.is_authenticated" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.utils.User.is_authorized">
+<span class="sig-name descname"><span class="pre">is_authorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.User.is_authorized" title="Link to this definition">¶</a></dt>
+<dd><p>Implements basic role-based access control.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="dynamic_webform.utils.download_datastore_in_specific_format">
 <span class="sig-prename descclassname"><span class="pre">dynamic_webform.utils.</span></span><span class="sig-name descname"><span class="pre">download_datastore_in_specific_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datastore</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_format</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.download_datastore_in_specific_format" title="Link to this definition">¶</a></dt>
@@ -361,6 +526,11 @@ and can be found in project documentation.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.utils.parse_user_auth_info_from_config">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.utils.</span></span><span class="sig-name descname"><span class="pre">parse_user_auth_info_from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.parse_user_auth_info_from_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dynamic_webform.utils.read_instance_config">
 <span class="sig-prename descclassname"><span class="pre">dynamic_webform.utils.</span></span><span class="sig-name descname"><span class="pre">read_instance_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config.yaml'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.read_instance_config" title="Link to this definition">¶</a></dt>
 <dd><p>Utility function to read main configuration YAML from the config folder and return a verified configuration dict.
@@ -394,6 +564,11 @@ By default, the function expects a file called config/config.yaml, and it is rec
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.utils.role_required">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.utils.</span></span><span class="sig-name descname"><span class="pre">role_required</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.role_required" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dynamic_webform.utils.scrape_form_content">
@@ -491,7 +666,7 @@ this utility function.</p>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">dynamic_webform package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dynamic-webform-app-module">dynamic_webform.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dynamic_webform.app">dynamic_webform.app module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dynamic_webform.utils">dynamic_webform.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-dynamic_webform">Module contents</a></li>
 </ul>

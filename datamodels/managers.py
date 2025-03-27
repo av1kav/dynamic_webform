@@ -1,8 +1,8 @@
 import os
-from ..datamodels.local_store import ParquetLocalDataStore
-from ..datamodels.mysql import MySQLDatastore
+from datamodels.local_store import ParquetLocalDataStore
+from datamodels.mysql import MySQLDatastore
 
-from ..loggers.managers import LoggerManager
+from loggers.managers import LoggerManager
 
 class BaseDatastoreManager:
     """

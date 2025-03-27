@@ -26,7 +26,7 @@ import pandas as pd
 import yaml
 import io
 
-from .loggers.managers import LoggerManager
+from loggers.managers import LoggerManager
 
 class User(UserMixin):
     def __init__(self, username, password, role, display_name):

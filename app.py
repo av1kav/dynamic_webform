@@ -2,12 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_login import LoginManager, login_user, logout_user, login_required
 from datetime import datetime
 import platform
-from .formbuilder.form_utils import generate_form_html_from_config_file
-from .formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
-from .utils import User, role_required
-from .utils import read_instance_config, parse_user_auth_info_from_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
-from .datamodels.managers import  DatastoreManager
-from .loggers.managers import LoggerManager
+from formbuilder.form_utils import generate_form_html_from_config_file
+from formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
+from utils import User, role_required
+from utils import read_instance_config, parse_user_auth_info_from_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
+from datamodels.managers import  DatastoreManager
+from loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
 import os
 
@@ -199,11 +199,9 @@ def login():
         None
     """
     if request.method == 'POST':
-        print(request.form)
         username = str(request.form.get('username'))
         password = str(request.form.get('password'))
-        print('authenticating:', username, password)
-        print(user_auth_info)
+        app_logger.info('Attempting to authenticate:', username, password)
         if username in user_auth_info and user_auth_info[username]['password'] == password:
             current_user = load_user(username)
             login_user(current_user)
@@ -245,24 +243,12 @@ def dashboard():
         'classes': ['table','table-striped', 'table-bordered'],
         'index': False
     }
-    if request.method == 'POST':
-        # Ensuring the user is authenticated
-        password = request.form.get('password')
-        if password == config['general']['legacy_dashboard_password']:
-            session['logged_in'] = True
-        else:
-            # Handle 2 types of POST requests - one which is from /login and one for files. Controlled by the 
-            # presence of the key "format"; if this key exists, we assume the POST is for downloading data
-            data = request.get_json()
-            target_format = data.get('format') 
-            if target_format:
-                # Key "format" exists, download datastore as file
-                return download_datastore_in_specific_format(datastore=datastore, target_format=target_format)
-            else:
-                # Key "format" does NOT exist, so return the appropriate response
-                flash('Incorrect password. Please try again.','danger')
-                return redirect(url_for('login'))
-
+    if request.method == 'POST':       
+        data = request.get_json()
+        target_format = data.get('format') 
+        if target_format:
+            # Key "format" exists, download datastore as file
+            return download_datastore_in_specific_format(datastore=datastore, target_format=target_format)
     return render_template('dashboard.html', form_submissions=df.to_html(**formatting_options))
 
 @app.route("/upload", methods=["GET", "POST"])

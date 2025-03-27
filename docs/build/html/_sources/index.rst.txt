@@ -8,6 +8,9 @@ dynamic_webform documentation
 
 Dynamic webform documentation
 
+Indices and tables
+------------------
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -15,7 +18,7 @@ Dynamic webform documentation
    dynamic_webform
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
