@@ -56,8 +56,6 @@ def form():
     Returns:
         None    
     """
-    # Refresh the datastore
-    datastore.refresh()
     # Pass the current timestamp to the form as page load time
     page_load_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     session_id = generate_websafe_session_id(config['general']['websafe_session_id_size'])

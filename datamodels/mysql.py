@@ -143,12 +143,6 @@ class MySQLDatastore:
         self.con.close()
         self.logger.info('Datastore connection check OK.')
     
-    def _refresh_table_schema(self):
-        """Helper function to track and auto-apply schema changes using flask-migrate (Alembic)."""
-        with self.app.app_context():
-            migrate(message="automigration")
-            upgrade()
-    
     def upsert_data(self, submission_data):
         """
         Perform an UPSERT (UPDATE row with the same session_id as the submission data, INSERT if such a row does not exist)

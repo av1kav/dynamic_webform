@@ -55,10 +55,6 @@ class DatastoreManager(BaseDatastoreManager):
         else:
             raise ValueError(f"ERROR: '{self.datastore_type}' is not a valid datastore_type value.")
     
-    def refresh(self):
-        """Refresh the form table schema (migrations handled with Alembic)"""
-        self.datastore._refresh_table_schema()
-    
     def add_data(self, submission_data):
         """
         Data INSERT operation, implements UPSERT logic.
