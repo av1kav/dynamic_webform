@@ -64,8 +64,8 @@ class MySQLDatastore:
         # Initialize the ORM engine and track schema modifications
         self.db.init_app(self.app)
         self.migrate.init_app(self.app, self.db)
-        if not os.path.exists(os.path.join('migrations','script.py.mako')):
-            self.logger.info('Initial setup, no migrations found. Creating new MySQL table from form_config Excel sheet.')
+        if not os.path.exists(os.path.join('migrations','versions')):
+            self.logger.info('Initial setup, no migration versions found. Creating new MySQL table from form_config Excel sheet.')
             with self.app.app_context():
                 self.db.create_all()
                 init()
