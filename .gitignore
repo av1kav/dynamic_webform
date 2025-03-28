@@ -1,0 +1,22 @@
+# Config YAML will need to be manually loaded into the web application, and is not tracked
+config/*.yaml
+# Ignore alembic migrations
+migrations/*
+migrations/env.py
+# Ignore compiled versions of code
+__pycache__/
+datamodels/__pycache__/
+formbuilder/__pycache__/
+# Ignore MacOS temp files
+*.DS_Store
+# Ignore any local stores
+*.parquet
+# Ignore all documentation apart from the final generated HTML (docs/build/html)
+docs/build/doctrees
+docs/logs
+docs/migrations
+docs/source/_static
+docs/source/_templates
+docs/source
+docs/make.bat
+docs/Makefile

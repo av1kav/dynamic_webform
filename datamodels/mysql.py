@@ -69,7 +69,6 @@ class MySQLDatastore:
             with self.app.app_context():
                 self.db.create_all()
                 init()
-        self._refresh_table_schema() 
         self.create_engine()
     
     def create_engine(self):
