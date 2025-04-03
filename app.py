@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, abort, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, abort, send_from_directory, send_file
 from flask_login import LoginManager, login_user, logout_user, login_required
 from datetime import datetime
 import platform
 from formbuilder.form_utils import generate_form_html_from_config_file
 from formbuilder.schema_utils import generate_schema_from_config_file, extract_form_response_data_using_schema
 from utils import User, role_required
-from utils import read_instance_config, parse_user_auth_info_from_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format
+from utils import read_instance_config, parse_user_auth_info_from_config, generate_websafe_session_id, l2_validations, l3_validations, get_ip_address, ip_info_check, send_session_id_reminder_email, is_valid_filename, read_uploaded_dataset, download_datastore_in_specific_format, generate_excel_template_from_schema
 from datamodels.managers import  DatastoreManager
 from loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
@@ -273,15 +273,32 @@ def upload_file():
             return jsonify({"error": "No selected file"}), 400
         
         if file and is_valid_filename(file.filename, config=config):
-            app_logger.info("Uploading filename: {file.filename}")
             filename = secure_filename(file.filename)
             file_path = os.path.join(config['datastore']['data_upload']['data_upload_folder'], filename)
             file.save(file_path)
             bulk_upload_data = read_uploaded_dataset(file_path, config=config)
             datastore.add_bulk_data(bulk_upload_data=bulk_upload_data)
-            return jsonify({"message": "File uploaded successfully"}), 200
+            return jsonify({"message": "Ingestion complete."}), 200
+        else:
+            app_logger.warning(f"Invalid file type when attempting upload for ingestion: {file.filename}")
+            return jsonify({"error": "Invalid file type."}), 400
 
     return render_template("upload.html")  # Render the HTML upload form
+
+@app.route('/generate_data_upload_template')
+def generate_data_upload_template():
+    """
+    Separate app route that simply returns an Excel-format template that contains all fields in the current
+    form schema. Useful when uploading data into the datastore.
+
+    NOTE: This app route needs to be separate since it is serving binary data.
+    """    
+    return send_file(
+        generate_excel_template_from_schema(form_schema=form_schema),
+        download_name="data_upload_template.xlsx", 
+        as_attachment=True,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 @login_required
 @role_required(authorized_roles=["viewer","admin"])

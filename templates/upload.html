@@ -60,11 +60,14 @@
         </div>
         <div class="text-left mt-5 mb-4">
             <h2>Step 1: Download the current dataset template</h3>
-            <p class="text-muted">Your data will need to match the columns in this file so it can be synced into the data store. You can modify your file manually, or just use this template to do so.</p>
+            <p class="text-muted">Your data file must match the columns currently in the datastore so it can be ingested correctly. You can create this file manually or just use <a download href="{{ url_for('generate_data_upload_template') }}">this template</a> to do so.
+                <br><br>
+                Keep in mind that, if you're uploading new data, you don't have to include the default 'id' and 'timestamp' columns; however, you must include them (and ensure they are correctly populated) if you are bulk-updating existing data. 
+            </p>
         </div>
         <div class="text-left mt-5 mb-4">
             <h2>Step 2: Upload the filled template</h3>
-            <p class="text-muted">Once your file is fully populated with column headers that match the current template, select your file for upload and hit the "Upload" button below.</p>
+            <p class="text-muted">Once your file is fully populated and has column headers that match the current template, select your file for upload and hit the "Upload" button below.</p>
         </div>
         <div id="progress-container">
             <div id="progress-bar"></div>
@@ -180,7 +183,6 @@
 
                 const formData = new FormData();
                 formData.append("file", fileInput.files[0]);
-
                 progressContainer.style.display = "block";
                 progressBar.style.width = "0%";
                 
@@ -196,13 +198,14 @@
                             }
                         }
                     });
-
-                    if (!response.ok) throw new Error("Upload failed.");
+                    const responseData = await response.json();
+                    if (!response.ok) throw new Error(responseData.error);
 
                     progressBar.style.width = "100%"; 
-                    messageDiv.innerHTML = `File uploaded successfully!`;
+                    messageDiv.innerHTML = responseData.message;
+
                 } catch (error) {
-                    messageDiv.innerHTML = "Error uploading file.";
+                    messageDiv.innerHTML = error;
                     progressContainer.style.display = "none";
                 }
             });

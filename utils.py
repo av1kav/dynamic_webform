@@ -89,6 +89,14 @@ def role_required(authorized_roles):
         return wrapper
     return decorator   
 
+def generate_excel_template_from_schema(form_schema):
+    df = pd.DataFrame(columns=[key for key in form_schema])
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="upload")
+    output.seek(0)
+    return output
+
 def download_datastore_in_specific_format(datastore, target_format):
     """
     Utility function to download the contents of the specified datastore 

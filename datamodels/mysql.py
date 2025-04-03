@@ -179,10 +179,10 @@ class MySQLDatastore:
         num_rows = len(bulk_upload_data)
         bulk_upload_data_columns = [x.lower() for x in bulk_upload_data.columns]
         if 'id' not in bulk_upload_data_columns:
-            self.logger.warrning("The 'id' field was not found in the uploaded dataset. New IDs will be generated.")
+            self.logger.warning("The 'id' field was not found in the uploaded dataset. New IDs will be generated.")
             bulk_upload_data['id'] = [generate_websafe_session_id(self.config['general']['websafe_session_id_size']) for _ in range(len(bulk_upload_data))]
         if 'timestamp' not in bulk_upload_data_columns:
-            self.logger.warrning("The 'timestamp' field was not found in the uploaded dataset. New timestamps will be generated.")
+            self.logger.warning("The 'timestamp' field was not found in the uploaded dataset. New timestamps will be generated.")
             bulk_upload_data['timestamp'] = datetime.now()
         # Prepare the data for bulk upsertion by converting it to a dict
         bulk_upload_data = bulk_upload_data.where((pd.notnull(bulk_upload_data)), None)

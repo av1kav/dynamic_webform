@@ -138,7 +138,6 @@ function populateFormFields(form_data) {
         }
     }
 };
-
 function downloadFile(format) {
     fetch("/dashboard", {
         method: "POST",
