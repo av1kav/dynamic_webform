@@ -38,6 +38,9 @@ class User(UserMixin):
     def get_id(self):
         return self.id
     
+    def get_role(self):
+        return self.role
+    
     def is_authenticated(self, user):
         if user.username == self.id and user.password == self.password:
             return True
@@ -45,7 +48,13 @@ class User(UserMixin):
     
     def is_authorized(self, role):
         """Implements basic role-based access control."""
-        return self.role == role
+        if type(role) == str:
+            return self.role == role
+        elif type(role) == list:
+            for authorized_role in role:
+                if self.role == authorized_role:
+                    return True
+            return False
     
     def is_active(self, user):
         """
@@ -69,11 +78,11 @@ def parse_user_auth_info_from_config(config):
         }
     return user_info
 
-def role_required(role):
+def role_required(authorized_roles):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            if not current_user.is_authorized(role):
+            if not current_user.is_authorized(authorized_roles): # this method is overloaded - both strings and lists work as args
                 flash('This page is not accessible based on your current role. Please reach out to the team for questions.', category='warning')
                 return redirect(url_for('login'))
             return f(*args, **kwargs)

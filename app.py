@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, abort, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required
 from datetime import datetime
 import platform
@@ -10,6 +10,7 @@ from datamodels.managers import  DatastoreManager
 from loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
 import os
+import glob
 
 ## Initialization ##
 # Read instance config YAML and form schema
@@ -251,7 +252,7 @@ def dashboard():
 
 @app.route("/upload", methods=["GET", "POST"])
 @login_required
-@role_required(role="admin")
+@role_required(authorized_roles=["admin"])
 def upload_file():
     """
     App route to handle data uploads into the database. Take caution to ensure the provided file has the correct headers;
@@ -281,6 +282,23 @@ def upload_file():
             return jsonify({"message": "File uploaded successfully"}), 200
 
     return render_template("upload.html")  # Render the HTML upload form
+
+@login_required
+@role_required(authorized_roles=["viewer","admin"])
+@app.route('/docs/<path:filename>')
+def serve_sphinx_docs(filename="index.html"):
+    parent_dir = config['general']['sphinx_docs']['parent_dir']
+    sub_path = config['general']['sphinx_docs']['sub_path']
+    suffix = "*.*"
+    safe_file_path = os.path.join(parent_dir, sub_path)
+    static_resources_path = os.path.join(safe_file_path,'_static')
+    # glob files to build an allow-list for the actual HTML files as well as the associated static content
+    # in order to prevent path traversal attacks. See CVE-2021-43494.
+    ALLOW_LIST = [x.split('/')[-1] for x in glob.glob(os.path.join(safe_file_path,suffix))] +\
+                 ['_static/' + x.split('/')[-1] for x in glob.glob(os.path.join(static_resources_path,suffix))]
+    if filename not in ALLOW_LIST:
+        abort(403)    
+    return send_from_directory(safe_file_path, filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
