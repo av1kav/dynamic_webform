@@ -137,7 +137,7 @@
           data: {
             labels: submissionTimeTrend_labels,
             datasets: [{
-              label: '# of Votes',
+              label: '# of Submissions',
               data: JSON.parse("{{ submissionTimeTrend_data | safe }}".replace(/'/g, '"')),
               borderWidth: 1
             }]
