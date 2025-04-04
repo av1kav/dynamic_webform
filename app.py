@@ -9,6 +9,7 @@ from utils import read_instance_config, parse_user_auth_info_from_config, genera
 from datamodels.managers import  DatastoreManager
 from loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
+import json
 import os
 import glob
 
@@ -248,7 +249,39 @@ def dashboard():
         if target_format:
             # Key "format" exists, download datastore as file
             return download_datastore_in_specific_format(datastore=datastore, target_format=target_format)
-    return render_template('dashboard.html', form_submissions=df.to_html(**formatting_options))
+    elif request.method == 'GET':
+        # Query aggregated data for submission time trend
+        submissionTimeTrend_result = datastore.read_aggregated_data(
+            group_by_field='timestamp',
+            aggregation_function='count',
+            aggregation_field='id',
+            field_options={
+                'CAST': {
+                    'target_field': 'timestamp',
+                    'target_type': 'date'
+                }
+            }
+        )
+        submissionTimeTrend_labels = [x.strftime("%m-%d-%y") for x in submissionTimeTrend_result['group'].to_list()]
+        submissionTimeTrend_data = submissionTimeTrend_result['aggregation'].to_list()
+
+        # Query aggregated data for submission time trend
+        categoryDonut_1_result = datastore.read_aggregated_data(
+            group_by_field='import_export',
+            aggregation_function='count',
+            aggregation_field='id'
+        )
+        categoryDonut_1_labels = categoryDonut_1_result['group'].to_list()
+        categoryDonut_1_data = categoryDonut_1_result['aggregation'].to_list()
+    
+    return render_template(
+        'dashboard.html',
+        form_submissions=df.to_html(**formatting_options),
+        submissionTimeTrend_labels=submissionTimeTrend_labels,
+        submissionTimeTrend_data=submissionTimeTrend_data,
+        categoryDonut_1_labels=categoryDonut_1_labels,
+        categoryDonut_1_data=categoryDonut_1_data
+    )
 
 @app.route("/upload", methods=["GET", "POST"])
 @login_required

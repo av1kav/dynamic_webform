@@ -88,3 +88,31 @@ class DatastoreManager(BaseDatastoreManager):
         """
         return self.datastore.query(id)
     
+    def read_aggregated_data(self,group_by_field, aggregation_function, aggregation_field, field_options=None):
+        """
+        A query interface into the datastore specifically meant for aggregations; see the underlying query_aggregated_data() 
+        method for implementation specifics.
+
+        Args:
+            group_by_field(str): Defaults to 'timestamp'. This denotes the field that would be used in an equivalent SQL GROUP BY clause.
+            aggregation_function(str): Defaults to 'count'. This is the aggregation function applied on the data. Must be one of ['count','avg','sum','min','max']
+            aggregation_field(str): Defaults to 'id'. Specifies the column that would have been specified in the aggregation function in SQL
+            field_options(dict): An optional field options dictionary for operations like CASTs. 
+                For example:
+                ```
+                    {
+                        CAST: {
+                            target_field: 'timestamp'
+                            target_type: 'date'
+                        }
+                    }
+                ```
+        Returns:
+            A Pandas DataFrame object containing aggregated query results.
+        """
+        return self.datastore.query_aggregated_data(
+            group_by_field=group_by_field,
+            aggregation_function=aggregation_function,
+            aggregation_field=aggregation_field,
+            field_options=field_options
+        )

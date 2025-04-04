@@ -1,14 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine,  cast, Date, Integer
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
 from sqlalchemy.dialects.mysql import insert
 from utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
-from flask_migrate import migrate, Migrate, init, upgrade
+from flask_migrate import Migrate, init
 import mysql.connector
 import pandas as pd
 import os
+from sqlalchemy.sql import func
 
 from loggers.managers import LoggerManager
 
@@ -33,6 +34,9 @@ class MySQLDatastore:
         logger(LoggerManager): A singleton logger instance for logging.
         sqlalchemy_database_uri: A SQLAlchemy URI generated using the config and added to the app dictionary
         engine: A SQLAlchemy ORM Engine to handle specific low-level data operations
+
+    Usage:
+        >>> datastore = MySQLDatastore(app, config) # Should be done within a DatastoreManager instance
     """
     def __init__(self, app, config):
         """
@@ -212,6 +216,85 @@ class MySQLDatastore:
             if id:
                 query = query.filter_by(id=id)
             df = pd.read_sql(query.statement, con=self.engine)
+            # Drop SQLAlchemy-specific metadata
+            if '_sa_instance_state' in df.columns:
+                df = df.drop(columns=["_sa_instance_state"])
+            return df
+    
+    def query_aggregated_data(self, group_by_field='timestamp', aggregation_function='count', aggregation_field='id', field_options=None):
+        """
+        Helper function to perform aggregation queries against the MySQL database associated with this Datastore instance. Used primarily for
+        reporting and visualization purposes.
+
+        Args:
+            group_by_field(str): Defaults to 'timestamp'. This denotes the field that would be used in an equivalent SQL GROUP BY clause.
+            aggregation_function(str): Defaults to 'count'. This is the aggregation function applied on the data. Must be one of ['count','avg','sum','min','max']
+            aggregation_field(str): Defaults to 'id'. Specifies the column that would have been specified in the aggregation function in SQL
+            field_options(dict): (Optional) An optional dictionary specifying field operation options; currently only the CAST operation is supported.
+                For example:
+                ```
+                    {
+                        CAST: {
+                            target_field: 'timestamp'
+                            target_type: 'date'
+                        }
+                    }
+                ```
+                target_type must be one of ['date','']
+        Returns:
+            A Pandas DataFrame object containing aggregated query results.
+        """
+        aggregation_function_map = {
+            "count": func.count,
+            "sum": func.sum,
+            #"avg": func.avg,
+            "min": func.min,
+            "max": func.max
+        }
+
+        # Validate parameters against data model
+        try:
+            getattr(self.table_model, group_by_field)
+        except AttributeError:
+            self.logger.warning(f"An invalid group_by_field, '{group_by_field}', was specified; an empty dataframe will be returned.")
+            return pd.DataFrame()
+        if aggregation_function not in aggregation_function_map:
+            self.logger.warning(f"An invalid aggregation_function value, '{aggregation_function}', was specified; an empty dataframe will be returned.")
+            return pd.DataFrame()
+        try:
+            getattr(self.table_model, aggregation_field)
+        except AttributeError:
+            self.logger.warning(f"An invalid aggregation_field, '{aggregation_field}', was specified; an empty dataframe will be returned.")
+            return pd.DataFrame()
+       
+        # Perform the aggregation query against the table
+        with Session(self.engine) as session:
+            
+            if field_options:
+                # Handle any field options eg. CASTs
+                if 'CAST' in field_options:
+                    target_field = field_options['CAST'].get('target_field')
+                    target_type = field_options['CAST'].get('target_type')
+                    if not target_field or not target_type or target_field not in [group_by_field, aggregation_field]:
+                        self.logger.warning("Invalid CAST options were specified for an aggregation query; they will be ignored.")
+                        return pd.DataFrame()
+                    else:
+                        if target_type == 'date':
+                            group_by_field = cast(getattr(self.table_model, group_by_field), Date) if target_field == group_by_field else getattr(self.table_model, group_by_field)
+                            aggregation_field = cast(getattr(self.table_model, aggregation_field), Date) if target_field == aggregation_field else getattr(self.table_model, aggregation_field)
+                        elif target_type == 'int':
+                            group_by_field = cast(getattr(self.table_model, group_by_field), Integer) if target_field == group_by_field else getattr(self.table_model, group_by_field)
+                            aggregation_field = cast(getattr(self.table_model, aggregation_field), Integer) if target_field == aggregation_field else getattr(self.table_model, aggregation_field)
+            else:
+                group_by_field = getattr(self.table_model, group_by_field)
+                aggregation_field = getattr(self.table_model, aggregation_field)
+            # Define and execute the query
+            aggregation_function = aggregation_function_map[aggregation_function]
+            aggregation_query = session.query(
+                group_by_field.label("group"), 
+                aggregation_function(aggregation_field).label("aggregation")
+            ).group_by(group_by_field)                            
+            df = pd.read_sql(aggregation_query.statement, con=self.engine)
             # Drop SQLAlchemy-specific metadata
             if '_sa_instance_state' in df.columns:
                 df = df.drop(columns=["_sa_instance_state"])
