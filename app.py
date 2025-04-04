@@ -266,21 +266,24 @@ def dashboard():
         submissionTimeTrend_data = submissionTimeTrend_result['aggregation'].to_list()
 
         # Query aggregated data for submission time trend
+        breakdown_field = 'import_export'
         categoryDonut_1_result = datastore.read_aggregated_data(
-            group_by_field='import_export',
+            group_by_field=breakdown_field,
             aggregation_function='count',
             aggregation_field='id'
         )
         categoryDonut_1_labels = categoryDonut_1_result['group'].to_list()
         categoryDonut_1_data = categoryDonut_1_result['aggregation'].to_list()
-    
+        categoryDonut_1_title = f"Breakdown by {breakdown_field}"
+
     return render_template(
         'dashboard.html',
         form_submissions=df.to_html(**formatting_options),
         submissionTimeTrend_labels=submissionTimeTrend_labels,
         submissionTimeTrend_data=submissionTimeTrend_data,
         categoryDonut_1_labels=categoryDonut_1_labels,
-        categoryDonut_1_data=categoryDonut_1_data
+        categoryDonut_1_data=categoryDonut_1_data,
+        categoryDonut_1_title=categoryDonut_1_title
     )
 
 @app.route("/upload", methods=["GET", "POST"])

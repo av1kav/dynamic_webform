@@ -151,7 +151,7 @@
             plugins: {
                 title: {
                     display: true,
-                    text: 'Submissions over time'
+                    text: 'Submissions over Time'
                 }
             }
           }
@@ -167,11 +167,7 @@
         new Chart(categoryDonut_1_Ctx, {
             type: 'doughnut',
             data: {
-                labels: [
-                    'Red',
-                    'Blue',
-                    'Yellow'
-                ],
+                labels: categoryDonut_1_labels,
                 datasets: [{
                     label: 'My First Dataset',
                     data: JSON.parse("{{ categoryDonut_1_data | safe }}".replace(/'/g, '"')),
@@ -183,7 +179,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Custom Chart Title'
+                        text: "{{ categoryDonut_1_title }}"
                     }
                 }
             }
