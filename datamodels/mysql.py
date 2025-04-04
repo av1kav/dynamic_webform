@@ -73,10 +73,15 @@ class MySQLDatastore:
         self.create_engine()
         self.db.init_app(self.app)
         self.migrate.init_app(self.app, self.db)
+        alembic_cfg = Config(os.path.join(os.path.dirname(__file__), '../migrations/alembic.ini'))
+        alembic_cfg.set_main_option('script_location', 'migrations')
         if not os.path.exists(os.path.join('migrations','versions')):
             self.logger.info('Initial setup, no migration versions found. Creating new MySQL table from form_config Excel sheet.')
             with self.app.app_context():
                 self.db.create_all()
+                command.init(alembic_cfg, 'migrations')
+                command.revision(alembic_cfg, message='initial migration', autogenerate=True)
+                command.upgrade(alembic_cfg, 'head')
                 init()
         self._run_migrations()
         
