@@ -242,6 +242,42 @@ high-level functions (see methods below). This is to maintain code readability a
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.datamodels.managers.DatastoreManager.read_aggregated_data">
+<span class="sig-name descname"><span class="pre">read_aggregated_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_by_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregation_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.datamodels.managers.DatastoreManager.read_aggregated_data" title="Link to this definition">¶</a></dt>
+<dd><p>A query interface into the datastore specifically meant for aggregations; see the underlying query_aggregated_data()
+method for implementation specifics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_by_field</strong> (<em>str</em>) – Defaults to ‘timestamp’. This denotes the field that would be used in an equivalent SQL GROUP BY clause.</p></li>
+<li><p><strong>aggregation_function</strong> (<em>str</em>) – Defaults to ‘count’. This is the aggregation function applied on the data. Must be one of [‘count’,’avg’,’sum’,’min’,’max’]</p></li>
+<li><p><strong>aggregation_field</strong> (<em>str</em>) – Defaults to ‘id’. Specifies the column that would have been specified in the aggregation function in SQL</p></li>
+<li><p><strong>field_options</strong> (<em>dict</em>) – <p>An optional field options dictionary for operations like CASTs.
+For example:
+<a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a></p>
+<blockquote>
+<div><dl>
+<dt>{</dt><dd><dl class="simple">
+<dt>CAST: {</dt><dd><p>target_field: ‘timestamp’
+target_type: ‘date’</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Pandas DataFrame object containing aggregated query results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="dynamic_webform.datamodels.managers.DatastoreManager.read_data">
 <span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.datamodels.managers.DatastoreManager.read_data" title="Link to this definition">¶</a></dt>
 <dd><p>A query interface into the datastore; an optional ID controls if a specific row or all rows are returned.</p>
@@ -357,6 +393,12 @@ high-level functions (see methods below). This is to maintain code readability a
 <dd><p>A SQLAlchemy ORM Engine to handle specific low-level data operations</p>
 </dd></dl>
 
+<dl>
+<dt>Usage:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">datastore</span> <span class="o">=</span> <span class="n">MySQLDatastore</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="c1"># Should be done within a DatastoreManager instance</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamic_webform.datamodels.mysql.MySQLDatastore.check_connection">
 <span class="sig-name descname"><span class="pre">check_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.datamodels.mysql.MySQLDatastore.check_connection" title="Link to this definition">¶</a></dt>
@@ -416,6 +458,43 @@ configuration information. Essentially controls the schema of the database table
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Pandas DataFrame object containing query results.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamic_webform.datamodels.mysql.MySQLDatastore.query_aggregated_data">
+<span class="sig-name descname"><span class="pre">query_aggregated_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_by_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'timestamp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregation_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregation_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.datamodels.mysql.MySQLDatastore.query_aggregated_data" title="Link to this definition">¶</a></dt>
+<dd><p>Helper function to perform aggregation queries against the MySQL database associated with this Datastore instance. Used primarily for
+reporting and visualization purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_by_field</strong> (<em>str</em>) – Defaults to ‘timestamp’. This denotes the field that would be used in an equivalent SQL GROUP BY clause.</p></li>
+<li><p><strong>aggregation_function</strong> (<em>str</em>) – Defaults to ‘count’. This is the aggregation function applied on the data. Must be one of [‘count’,’avg’,’sum’,’min’,’max’]</p></li>
+<li><p><strong>aggregation_field</strong> (<em>str</em>) – Defaults to ‘id’. Specifies the column that would have been specified in the aggregation function in SQL</p></li>
+<li><p><strong>field_options</strong> (<em>dict</em>) – <p>(Optional) An optional dictionary specifying field operation options; currently only the CAST operation is supported.
+For example:
+<a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a></p>
+<blockquote>
+<div><dl>
+<dt>{</dt><dd><dl class="simple">
+<dt>CAST: {</dt><dd><p>target_field: ‘timestamp’
+target_type: ‘date’</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p><a href="#id13"><span class="problematic" id="id14">``</span></a>`
+target_type must be one of [‘date’,’’]</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Pandas DataFrame object containing aggregated query results.</p>
 </dd>
 </dl>
 </dd></dl>

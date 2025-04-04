@@ -123,6 +123,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.add_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.add_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.check_connection"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.check_connection()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.delete_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.delete_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.read_aggregated_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.read_aggregated_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.read_data"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.read_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.managers.DatastoreManager.refresh"><code class="docutils literal notranslate"><span class="pre">DatastoreManager.refresh()</span></code></a></li>
 </ul>
@@ -145,6 +146,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.mysql.MySQLDatastore.generate_database_uri_from_config"><code class="docutils literal notranslate"><span class="pre">MySQLDatastore.generate_database_uri_from_config()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.mysql.MySQLDatastore.generate_table_orm_from_config_file"><code class="docutils literal notranslate"><span class="pre">MySQLDatastore.generate_table_orm_from_config_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.mysql.MySQLDatastore.query"><code class="docutils literal notranslate"><span class="pre">MySQLDatastore.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.mysql.MySQLDatastore.query_aggregated_data"><code class="docutils literal notranslate"><span class="pre">MySQLDatastore.query_aggregated_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.mysql.MySQLDatastore.upsert_bulk_data"><code class="docutils literal notranslate"><span class="pre">MySQLDatastore.upsert_bulk_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dynamic_webform.datamodels.html#dynamic_webform.datamodels.mysql.MySQLDatastore.upsert_data"><code class="docutils literal notranslate"><span class="pre">MySQLDatastore.upsert_data()</span></code></a></li>
 </ul>
@@ -247,6 +249,14 @@ displayed in an interactable element.</p>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.app.generate_data_upload_template">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.app.</span></span><span class="sig-name descname"><span class="pre">generate_data_upload_template</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.app.generate_data_upload_template" title="Link to this definition">¶</a></dt>
+<dd><p>Separate app route that simply returns an Excel-format template that contains all fields in the current
+form schema. Useful when uploading data into the datastore.</p>
+<p>NOTE: This app route needs to be separate since it is serving binary data.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -421,6 +431,11 @@ this project, any users listed in the instance config YAML are considered active
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamic_webform.utils.generate_excel_template_from_schema">
+<span class="sig-prename descclassname"><span class="pre">dynamic_webform.utils.</span></span><span class="sig-name descname"><span class="pre">generate_excel_template_from_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form_schema</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dynamic_webform.utils.generate_excel_template_from_schema" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dynamic_webform.utils.generate_html_table_using_form_content_html">

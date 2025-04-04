@@ -85,9 +85,45 @@
             
   <section id="dynamic-webform-documentation">
 <h1>dynamic_webform documentation<a class="headerlink" href="#dynamic-webform-documentation" title="Link to this heading">¶</a></h1>
-<p>Dynamic webform documentation</p>
-<section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h2>
+<section id="beta-test">
+<h2>Beta Test<a class="headerlink" href="#beta-test" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>What are dynamic webforms? No-code solution to form data management. You define and manage a configuration, and the form fields, database and API management are handled by the system. Users can freely submit and update their data using a session-ID token, and can be configured to receive email reminders. Members of the SOM Research team can then perform actions based on their role permissions.</p></li>
+<li><p>All websites need to run on some sort of hosting platform. We are using PythonAnywhere because it is free and gives us database access. Only admins will have credentials to log into the web server and manage the site (change the form fields, upload data into the database)</p></li>
+<li><dl class="simple">
+<dt>The data platform has two configuration files that users will need to edit.</dt><dd><ol class="arabic simple">
+<li><p>The instance configuration YAML: A YAML file with credentials needed to initialize the web server application, database keys, form validation/analytics features etc.</p></li>
+<li><p>The form config Excel: An Excel sheet that contains all the fields that should be contained in the dynamic webform. The database will automatically be brought in sync with the columns in this file to ensure automated form data management.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Admins have privileges to bulk-insert data as well, formats of which are also controlled by the config. This can be both for new data as well as updating existing data</dt><dd><ol class="arabic simple">
+<li><p>When bulk-inserting new data, do not include the ‘id’ and ‘timestamp’ fields</p></li>
+<li><p>When bulk-updating existing data, include the ‘id’ and ‘timestamp’ fields, ensuring they are filled out for all rows</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>User story walkthrough:</dt><dd><ol class="arabic simple">
+<li><p>Viewing summary analytics (summary graphs and charts)</p></li>
+<li><p>Viewing form submission history</p></li>
+<li><p>Uploading new data into the database</p></li>
+<li><p>Viewing documentation pages</p></li>
+<li><p>Uploading the form configuration excel (i.e. changing what the form looks like)</p></li>
+<li><p>Configuring the instance configuration file</p></li>
+<li><p>Configuring the dynamic webform config Excel sheet</p></li>
+<li><p>Generating documentation</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -102,8 +138,8 @@
 </ul>
 </div>
 </section>
-<section id="id1">
-<h2>Indices and tables<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="indices-and-search">
+<h2>Indices and Search<a class="headerlink" href="#indices-and-search" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
