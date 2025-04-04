@@ -97,7 +97,6 @@ class MySQLDatastore:
         with self.app.app_context():
             alembic_cfg = Config(os.path.join(os.path.dirname(__file__), '../migrations/alembic.ini'))
             alembic_cfg.set_main_option('script_location', 'migrations')
-            command.upgrade(alembic_cfg, 'head')
             with Session(self.db.engine) as session:
                 conn = session.connection()
                 ctx = MigrationContext.configure(conn)
