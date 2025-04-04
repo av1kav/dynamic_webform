@@ -97,12 +97,13 @@ class MySQLDatastore:
         with self.app.app_context():
             alembic_cfg = Config(os.path.join(os.path.dirname(__file__), '../migrations/alembic.ini'))
             alembic_cfg.set_main_option('script_location', 'migrations')
+            command.upgrade(alembic_cfg, 'head')
             with Session(self.db.engine) as session:
                 conn = session.connection()
                 ctx = MigrationContext.configure(conn)
                 diffs = compare_metadata(ctx, self.db.metadata)
                 if diffs:
-                    self.logger.info("Schema changes detected. Generating and applying auto-migration.")
+                    self.logger.warning("Schema changes detected. Generating and applying auto-migration.")
                     command.revision(alembic_cfg, message="auto-migration", autogenerate=True)
                     command.upgrade(alembic_cfg, 'head')
                 else:
