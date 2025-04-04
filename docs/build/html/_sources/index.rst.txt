@@ -8,6 +8,9 @@ dynamic_webform documentation
 
 Beta Test
 ---------
+
+Add a new line here
+
 1. What are dynamic webforms? No-code solution to form data management. You define and manage a configuration, and the form fields, database and API management are handled by the system. Users can freely submit and update their data using a session-ID token, and can be configured to receive email reminders. Members of the SOM Research team can then perform actions based on their role permissions.
 2. All websites need to run on some sort of hosting platform. We are using PythonAnywhere because it is free and gives us database access. Only admins will have credentials to log into the web server and manage the site (change the form fields, upload data into the database)
 3. The data platform has two configuration files that users will need to edit. 
