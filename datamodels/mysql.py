@@ -6,6 +6,10 @@ from utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
 from flask_migrate import Migrate, init
+from alembic import command
+from alembic.config import Config
+from alembic.autogenerate import compare_metadata
+from alembic.migration import MigrationContext
 import mysql.connector
 import pandas as pd
 import os
@@ -66,6 +70,7 @@ class MySQLDatastore:
             self.logger.info(f"Added {key}={value} to app config")
         
         # Initialize the ORM engine and track schema modifications
+        self.create_engine()
         self.db.init_app(self.app)
         self.migrate.init_app(self.app, self.db)
         if not os.path.exists(os.path.join('migrations','versions')):
@@ -73,8 +78,36 @@ class MySQLDatastore:
             with self.app.app_context():
                 self.db.create_all()
                 init()
-        self.create_engine()
-    
+        self._run_migrations()
+        
+    def _run_migrations(self):
+        """
+        Internal method to detect schema changes and perform automatic migrations if necessary. This method contains the bulk of the
+        automated data management system logic. and requires a table model to be defined and associated before running.
+
+        Args:
+            None
+        
+        Returns:
+            None
+
+        Usage:
+            >>> self._run_migrations()
+        """
+        with self.app.app_context():
+            alembic_cfg = Config(os.path.join(os.path.dirname(__file__), '../migrations/alembic.ini'))
+            alembic_cfg.set_main_option('script_location', 'migrations')
+            with Session(self.db.engine) as session:
+                conn = session.connection()
+                ctx = MigrationContext.configure(conn)
+                diffs = compare_metadata(ctx, self.db.metadata)
+                if diffs:
+                    self.logger.info("Schema changes detected. Generating and applying auto-migration.")
+                    command.revision(alembic_cfg, message="auto-migration", autogenerate=True)
+                    command.upgrade(alembic_cfg, 'head')
+                else:
+                    self.logger.info("No schema changes detected. Skipping auto-migration.")
+   
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
         self.engine = create_engine(self.sqlalchemy_database_uri, echo=True)
