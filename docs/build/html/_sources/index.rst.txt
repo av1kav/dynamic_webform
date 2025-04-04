@@ -18,13 +18,26 @@ Beta Test
     2. When bulk-updating existing data, include the 'id' and 'timestamp' fields, ensuring they are filled out for all rows
 5. User story walkthrough:
     1. Viewing summary analytics (summary graphs and charts)
+        1. Configuring the dynamic donut breakdown chart
     2. Viewing form submission history
+        1. Exporting data from the database
     3. Uploading new data into the database
+        1. Type restrictions in the config
+        2. Dataset size limitations
     4. Viewing documentation pages
     5. Uploading the form configuration excel (i.e. changing what the form looks like)
+        1. Min-5 page requirement
+        2. Reminder to reload
     6. Configuring the instance configuration file
-    7. Configuring the dynamic webform config Excel sheet
-    8. Generating documentation
+        1. Managing server-side config variables
+        2. Reminder to reload
+    7. Generating documentation
+        1. Generating rst sources
+        2. Generating HTML
+        3. VCS sync and Reminder to reload
+    8. Syncing code changes from VCS
+        1. Git and current hosting target
+        2. Eventual plan: host UB VCS system
 
 API Reference
 -------------
