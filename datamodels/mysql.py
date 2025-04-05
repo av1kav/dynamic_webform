@@ -5,11 +5,7 @@ from sqlalchemy.dialects.mysql import insert
 from utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
-from flask_migrate import Migrate, init
-from alembic import command
-from alembic.config import Config
-from alembic.autogenerate import compare_metadata
-from alembic.migration import MigrationContext
+from flask_migrate import Migrate, init, revision, migrate, upgrade
 import mysql.connector
 import pandas as pd
 import os
@@ -57,10 +53,9 @@ class MySQLDatastore:
         self.config = config
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
-        self.migrate = Migrate(self.app,self.db)
         self.logger = LoggerManager.get_logger()
 
-        # Set up MYSQL connection parameters
+        # Set up MYSQL and SQLAlchemy
         mysql_config_params = self.config['datastore']['datastore_params']
         self.sqlalchemy_database_uri = self.generate_database_uri_from_config(mysql_config_params=mysql_config_params)
         self.app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_database_uri
@@ -68,20 +63,14 @@ class MySQLDatastore:
         for key, value in mysql_config_params.get('mysql_sqlalchemy_engine_options',{}).items():
             app.config[key] = value
             self.logger.info(f"Added {key}={value} to app config")
-        
-        # Initialize the ORM engine and track schema modifications
-        self.create_engine()
         self.db.init_app(self.app)
-        self.migrate.init_app(self.app, self.db)
-        alembic_cfg = Config(os.path.join(os.path.dirname(__file__), '../migrations/alembic.ini'))
-        alembic_cfg.set_main_option('script_location', 'migrations')
-        if not os.path.exists(os.path.join('migrations','versions')):
-            self.logger.info('Initial setup, no migration versions found. Creating new MySQL table from form_config Excel sheet.')
+        self.create_engine()
+
+        # Initialize flask-migrate (Alembic) and run a single migration
+        self.migrate = Migrate(self.app,self.db)
+        if not os.path.exists('migrations'):
+            self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
             with self.app.app_context():
-                self.db.create_all()
-                command.init(alembic_cfg, 'migrations')
-                command.revision(alembic_cfg, message='initial migration', autogenerate=True)
-                command.upgrade(alembic_cfg, 'head')
                 init()
         self._run_migrations()
         
@@ -90,6 +79,10 @@ class MySQLDatastore:
         Internal method to detect schema changes and perform automatic migrations if necessary. This method contains the bulk of the
         automated data management system logic. and requires a table model to be defined and associated before running.
 
+        Why are these two lines of python under an app_context() context manager? Simple - the actual migration process can be controlled.
+        If, in the future, an explicit manual run (eg. through the command line) or some additional approvals are needed, this method can be 
+        extended as needed without needing to manage the complexity of the datastore's __init__() constructor.
+        
         Args:
             None
         
@@ -100,18 +93,8 @@ class MySQLDatastore:
             >>> self._run_migrations()
         """
         with self.app.app_context():
-            alembic_cfg = Config(os.path.join(os.path.dirname(__file__), '../migrations/alembic.ini'))
-            alembic_cfg.set_main_option('script_location', 'migrations')
-            with Session(self.db.engine) as session:
-                conn = session.connection()
-                ctx = MigrationContext.configure(conn)
-                diffs = compare_metadata(ctx, self.db.metadata)
-                if diffs:
-                    self.logger.warning("Schema changes detected. Generating and applying auto-migration.")
-                    command.revision(alembic_cfg, message="auto-migration", autogenerate=True)
-                    command.upgrade(alembic_cfg, 'head')
-                else:
-                    self.logger.info("No schema changes detected. Skipping auto-migration.")
+            migrate(message="auto-migration")
+            upgrade()
    
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
