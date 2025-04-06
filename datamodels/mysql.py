@@ -68,33 +68,12 @@ class MySQLDatastore:
         # Initialize flask-migrate (Alembic), load the table model and run a single migration
         self.migrate = Migrate(self.app,self.db)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
-        if not os.path.exists('migrations'):
-            self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
-            with self.app.app_context():
-                init()
-        else:
-            self.logger.warning("A migrations folder already exists - skipping flask-migrate initialization.")
-        self._run_migrations()
-        
-    def _run_migrations(self):
-        """
-        Internal method to detect schema changes and perform automatic migrations if necessary. This method contains the bulk of the
-        automated data management system logic. and requires a table model to be defined and associated before running.
-
-        Why are these two lines of python under a context manager in a standalone method? This is just to control the actual migration process.
-        If, in the future, an explicit manual upgrade (eg. through the command line) or some additional approvals are needed before an upgrade,
-        this method can be modified accordingly without needing to manage the complexity of the datastore's __init__() constructor.
-        
-        Args:
-            None
-        
-        Returns:
-            None
-
-        Usage:
-            >>> self._run_migrations()
-        """
         with self.app.app_context():
+            if not os.path.exists('migrations'):
+                self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
+                init()
+            else:
+                self.logger.warning("A migrations folder already exists - skipping flask-migrate initialization.")
             migrate(message="auto-migration")
             upgrade()
    
@@ -136,7 +115,7 @@ class MySQLDatastore:
         """
         # Define the default table schema with ID and timestamp fields
         attributes = {
-            "__tablename__": config_filename.split('.')[0],
+            "__tablename__": config_filename.split('.')[0].lower(),
             "__table_args__": {'extend_existing': True},
             "id": Column(Integer, primary_key=True),
         }
@@ -154,9 +133,9 @@ class MySQLDatastore:
         for _, row in form_fields.iterrows():
             col_name = row["backend_field_name"]
             col_type = SQLALCHEMY_TYPE_MAPPING.get(row["data_type"], String(255))
-            nullable = True if row["required"] == 'No' else False
+            nullable = True if row["required"].lower() == 'no' else False
             attributes[col_name] = Column(col_type, nullable=nullable, primary_key=False)
-        return type(attributes['__tablename__'].capitalize(), (self.db.Model,), attributes)
+        return type(attributes['__tablename__'], (self.db.Model,), attributes)
 
     def check_connection(self):
         """'Check' the existing connection associated with this Datastore instance by opening and closing the configured connection."""
