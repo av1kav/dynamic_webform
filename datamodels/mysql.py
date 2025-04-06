@@ -70,7 +70,6 @@ class MySQLDatastore:
         self.migrate = Migrate(self.app,self.db)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         with self.app.app_context():
-            self.logger.warning(f"DB Metadata tables: {self.db.metadata.tables.keys()}")
             if not os.path.exists('migrations'):
                 self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
                 init() 
@@ -105,8 +104,9 @@ class MySQLDatastore:
     
     def generate_table_orm_from_config_file(self, config_folder='formbuilder',config_filename='wny_config.xlsx'):
         """
-        Generates an Object-Relational Mapper (ORM) that is an object representation of the actual database table. Generated 
-        dynamically using the form_config Excel sheet, and is used to control data operations on the underlying table.
+        Generates an ORM (object representation of the actual database table) and creates it under the configured engine.
+        The model is generated dynamically using the form_config Excel sheet, and will be used as a reference by Alembic
+        to build migration scripts. The first "migration" will be blank, since this method also creates the 
 
         Args:
             config_folder(str): (Optional, default='formbuilder') The name of the folder, under the config/ directory, 
@@ -115,7 +115,7 @@ class MySQLDatastore:
                                   configuration information. Essentially controls the schema of the database table and ORM,
         
         Returns:
-            A SQLAlchemy db.Model instance (ORM)
+            A SQLAlchemy db.Model class object
         """
         # Define the default table schema with ID and timestamp fields
         attributes = {
@@ -139,7 +139,11 @@ class MySQLDatastore:
             col_type = SQLALCHEMY_TYPE_MAPPING.get(row["data_type"], String(255))
             nullable = True if row["required"].lower() == 'no' else False
             attributes[col_name] = Column(col_type, nullable=nullable, primary_key=False)
-        return type(attributes['__tablename__'], (self.db.Model,), attributes)
+        # For alembic
+        model = type(attributes['__tablename__'], (self.db.Model,), attributes)
+        with self.app.app_context():
+            self.db.metadata.create_all(bind=self.db.engine)
+        return model
 
     def check_connection(self):
         """'Check' the existing connection associated with this Datastore instance by opening and closing the configured connection."""
