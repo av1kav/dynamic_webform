@@ -9,7 +9,6 @@ from utils import read_instance_config, parse_user_auth_info_from_config, genera
 from datamodels.managers import  DatastoreManager
 from loggers.managers import LoggerManager
 from werkzeug.utils import secure_filename
-import json
 import os
 import glob
 

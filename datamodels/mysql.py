@@ -40,7 +40,8 @@ class MySQLDatastore:
     """
     def __init__(self, app, config):
         """
-        Set up a MySQL connection, initialize the ORM engine and use Alembic to perform any necessary migrations.
+        Set up a MySQL connection, initialize the ORM engine and use Flask-Migrate (Alembic) to perform any necessary migrations
+        to bring the database in sync with the fields in the form configuration sheet.
 
         Args:
             app(Flask): The Flask app implementing this Datastore instance.
@@ -54,7 +55,7 @@ class MySQLDatastore:
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
         self.logger = LoggerManager.get_logger()
 
-        # Set up MYSQL and SQLAlchemy
+        # Set up MYSQL and initialize the SQLAlchemy ORM engine
         mysql_config_params = self.config['datastore']['datastore_params']
         self.sqlalchemy_database_uri = self.generate_database_uri_from_config(mysql_config_params=mysql_config_params)
         self.app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_database_uri
@@ -69,13 +70,16 @@ class MySQLDatastore:
         self.migrate = Migrate(self.app,self.db)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         with self.app.app_context():
+            self.logger.warning(f"DB Metadata tables: {self.db.metadata.tables.keys()}")
             if not os.path.exists('migrations'):
                 self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
-                init()
+                init() 
+                migrate(message="Initial table migration")
+                upgrade()
             else:
                 self.logger.warning("A migrations folder already exists - skipping flask-migrate initialization.")
-            migrate(message="auto-migration")
-            upgrade()
+                migrate(message="auto-migration")
+                upgrade()
    
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
@@ -117,7 +121,7 @@ class MySQLDatastore:
         attributes = {
             "__tablename__": config_filename.split('.')[0].lower(),
             "__table_args__": {'extend_existing': True},
-            "id": Column(Integer, primary_key=True),
+            "id": Column(Integer, primary_key=True), 
         }
         attributes['id'] = Column(String(255), nullable=False, primary_key=True)
         attributes['timestamp'] = Column(DateTime, nullable=False, primary_key=False)
