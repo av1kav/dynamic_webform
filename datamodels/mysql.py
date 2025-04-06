@@ -52,7 +52,6 @@ class MySQLDatastore:
         self.db = SQLAlchemy()
         self.config = config
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
-        self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         self.logger = LoggerManager.get_logger()
 
         # Set up MYSQL and SQLAlchemy
@@ -66,12 +65,15 @@ class MySQLDatastore:
         self.db.init_app(self.app)
         self.create_engine()
 
-        # Initialize flask-migrate (Alembic) and run a single migration
+        # Initialize flask-migrate (Alembic), load the table model and run a single migration
         self.migrate = Migrate(self.app,self.db)
+        self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         if not os.path.exists('migrations'):
             self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
             with self.app.app_context():
                 init()
+        else:
+            self.logger.warning("A migrations folder already exists - skipping flask-migrate initialization.")
         self._run_migrations()
         
     def _run_migrations(self):
@@ -79,9 +81,9 @@ class MySQLDatastore:
         Internal method to detect schema changes and perform automatic migrations if necessary. This method contains the bulk of the
         automated data management system logic. and requires a table model to be defined and associated before running.
 
-        Why are these two lines of python under an app_context() context manager? Simple - the actual migration process can be controlled.
-        If, in the future, an explicit manual run (eg. through the command line) or some additional approvals are needed, this method can be 
-        extended as needed without needing to manage the complexity of the datastore's __init__() constructor.
+        Why are these two lines of python under a context manager in a standalone method? This is just to control the actual migration process.
+        If, in the future, an explicit manual upgrade (eg. through the command line) or some additional approvals are needed before an upgrade,
+        this method can be modified accordingly without needing to manage the complexity of the datastore's __init__() constructor.
         
         Args:
             None
