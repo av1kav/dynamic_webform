@@ -91,7 +91,7 @@ class MySQLDatastore:
 
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
-        self.engine = create_engine(self.sqlalchemy_database_uri, echo=True).execution_options(isolation_level="AUTOCOMMIT")
+        self.engine = create_engine(self.sqlalchemy_database_uri, echo=True).execution_options(isolation_level="SERIALIZABLE")
     
     def generate_database_uri_from_config(self, mysql_config_params):
         """
