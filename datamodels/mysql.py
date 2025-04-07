@@ -69,10 +69,10 @@ class MySQLDatastore:
 
         def alembic_include_object_fn(object, name, type_, reflected, compare_to):
             if (type_ == "table" and name == self.table_name and object.schema == self.table_schema):
-                print(f"Found {type_}: {name}, {object}")
+                self.logger.warning(f"Found {type_}: {name}, {object}")
                 return False
             else:
-                print(f"Found {type_}: {name}, {object}, looks good")
+                self.logger.warning(f"Found {type_}: {name}, {object}, looks good")
                 return True
         
         # Initialize flask-migrate (Alembic), load the table model and run a single migration
