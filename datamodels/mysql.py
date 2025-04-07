@@ -77,7 +77,7 @@ class MySQLDatastore:
                 return True  
             
         # Initialize flask-migrate (Alembic), load the table model and run a single migration
-        self.migrate = Migrate(self.app, self.db, include_schemas=True, include_object=alembic_include_object_fn)
+        self.migrate = Migrate(self.app, self.db, include_object=alembic_include_object_fn)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         with self.app.app_context():
             if not os.path.exists('migrations'):
@@ -92,7 +92,7 @@ class MySQLDatastore:
 
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
-        self.engine = create_engine(self.sqlalchemy_database_uri, echo=True).execution_options(isolation_level="SERIALIZABLE")
+        self.engine = create_engine(self.sqlalchemy_database_uri, echo=True)
     
     def generate_database_uri_from_config(self, mysql_config_params):
         """
