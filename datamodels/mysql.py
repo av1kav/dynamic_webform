@@ -72,7 +72,6 @@ class MySQLDatastore:
         with self.app.app_context():
             if not os.path.exists('migrations'):
                 self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
-                self.db.create_all()
                 init()
             migrate(message="auto-migration")
             upgrade() 
