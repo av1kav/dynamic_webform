@@ -64,8 +64,8 @@ class MySQLDatastore:
         for key, value in mysql_config_params.get('mysql_sqlalchemy_engine_options',{}).items():
             app.config[key] = value
             self.logger.info(f"Added {key}={value} to app config")
-        self.db.init_app(self.app)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
+        self.db.init_app(self.app)
 
         # Initialize flask-migrate (Alembic), load the table model and run a single migration if required
         self.migrate = Migrate(self.app, self.db)
