@@ -65,10 +65,10 @@ class MySQLDatastore:
             app.config[key] = value
             self.logger.info(f"Added {key}={value} to app config")
         self.db.init_app(self.app)
+        self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
 
         # Initialize flask-migrate (Alembic), load the table model and run a single migration if required
         self.migrate = Migrate(self.app, self.db)
-        self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         with self.app.app_context():
             if not os.path.exists('migrations'):
                 self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")

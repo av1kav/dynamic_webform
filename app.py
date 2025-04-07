@@ -37,7 +37,7 @@ user_auth_info = parse_user_auth_info_from_config(config)
 @login_manager.user_loader
 def load_user(user_id):
     """
-    This function is here because it needs an instantiated LoginManager.
+    This function is here because its decorator uses an instantiated LoginManager instance.
     """
     if user_id in user_auth_info:
         return User(**user_auth_info[user_id])
