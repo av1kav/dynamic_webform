@@ -151,9 +151,6 @@ class MySQLDatastore:
             attributes[col_name] = Column(col_type, nullable=nullable, primary_key=False)
         # For alembic
         model = type(attributes['__tablename__'], (self.db.Model,), attributes)
-
-        with self.app.app_context():
-            self.db.metadata.create_all(bind=self.db.engine)
         return model
 
     def check_connection(self):
