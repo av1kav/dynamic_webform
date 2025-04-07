@@ -67,16 +67,17 @@ class MySQLDatastore:
         self.db.init_app(self.app)
         self.create_engine() 
 
+        # Helper function for alembic
         def alembic_include_object_fn(object, name, type_, reflected, compare_to):
             if (type_ == "table" and name == self.table_name and object.schema == self.table_schema):
                 self.logger.warning(f"Found {type_}: {name}, {object}")
                 return False
             else:
                 self.logger.warning(f"Found {type_}: {name}, {object}, looks good")
-                return True
-        
+                return True  
+            
         # Initialize flask-migrate (Alembic), load the table model and run a single migration
-        self.migrate = Migrate(self.app,self.db,include_object=alembic_include_object_fn)
+        self.migrate = Migrate(self.app, self.db, include_schemas=True, include_object=alembic_include_object_fn)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         with self.app.app_context():
             if not os.path.exists('migrations'):
