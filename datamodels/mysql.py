@@ -65,7 +65,6 @@ class MySQLDatastore:
             app.config[key] = value
             self.logger.info(f"Added {key}={value} to app config")
         self.db.init_app(self.app)
-        self.create_engine()
 
         # Initialize flask-migrate (Alembic), load the table model and run a single migration if required
         self.migrate = Migrate(self.app, self.db)
@@ -76,7 +75,8 @@ class MySQLDatastore:
                 self.db.create_all()
                 init()
             migrate(message="auto-migration")
-            upgrade()
+            upgrade() 
+        self.create_engine()
 
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
