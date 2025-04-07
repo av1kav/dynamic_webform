@@ -53,6 +53,7 @@ class MySQLDatastore:
         self.db = SQLAlchemy()
         self.config = config
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
+        self.table_schema = self.config['datastore']['datastore_params']['mysql_database'] # Not a typo - MySQL does not have "schemas"
         self.logger = LoggerManager.get_logger()
 
         # Set up MYSQL and initialize the SQLAlchemy ORM engine
@@ -64,10 +65,18 @@ class MySQLDatastore:
             app.config[key] = value
             self.logger.info(f"Added {key}={value} to app config")
         self.db.init_app(self.app)
-        self.create_engine()
+        self.create_engine() 
 
+        def alembic_include_object_fn(object, name, type_, reflected, compare_to):
+            if (type_ == "table" and name == self.table_name and object.schema == self.table_schema):
+                print(f"Found {type_}: {name}, {object}")
+                return False
+            else:
+                print(f"Found {type_}: {name}, {object}, looks good")
+                return True
+        
         # Initialize flask-migrate (Alembic), load the table model and run a single migration
-        self.migrate = Migrate(self.app,self.db)
+        self.migrate = Migrate(self.app,self.db,include_object=alembic_include_object_fn)
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         with self.app.app_context():
             if not os.path.exists('migrations'):
@@ -79,7 +88,7 @@ class MySQLDatastore:
                 self.logger.warning("A migrations folder already exists - skipping flask-migrate initialization.")
                 migrate(message="auto-migration")
                 upgrade()
-   
+
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
         self.engine = create_engine(self.sqlalchemy_database_uri, echo=True)
@@ -125,6 +134,7 @@ class MySQLDatastore:
         }
         attributes['id'] = Column(String(255), nullable=False, primary_key=True)
         attributes['timestamp'] = Column(DateTime, nullable=False, primary_key=False)
+        attributes['schema'] = self.table_schema
 
         # Then build the remainder of the schema dynamically from the form config file
         config_folder = os.path.join('config',config_folder)
@@ -141,6 +151,7 @@ class MySQLDatastore:
             attributes[col_name] = Column(col_type, nullable=nullable, primary_key=False)
         # For alembic
         model = type(attributes['__tablename__'], (self.db.Model,), attributes)
+
         with self.app.app_context():
             self.db.metadata.create_all(bind=self.db.engine)
         return model
