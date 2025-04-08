@@ -33,6 +33,7 @@ packaging==24.2
 pandas==2.2.3
 propcache==0.2.1
 Pygments==2.19.1
+PyMySQL==1.1.1
 python-dateutil==2.9.0.post0
 pytz==2025.1
 PyYAML==6.0.2

@@ -1,11 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine,  cast, Date, Integer
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
+from sqlalchemy import create_engine, cast
+from sqlalchemy import Column, Integer, Date, String, Float, Boolean, DateTime
 from sqlalchemy.dialects.mysql import insert
 from utils import generate_websafe_session_id
 from datetime import datetime
 from sqlalchemy.orm import Session
-from flask_migrate import Migrate, init, revision, migrate, upgrade
+from flask_migrate import Migrate, init, migrate, upgrade
 import mysql.connector
 import pandas as pd
 import os
@@ -66,16 +66,16 @@ class MySQLDatastore:
             self.logger.info(f"Added {key}={value} to app config")
         self.table_model = self.generate_table_orm_from_config_file(config_folder='form_config',config_filename=self.config['form']['form_config_file_name'])  
         self.db.init_app(self.app)
+        self.create_engine()
 
         # Initialize flask-migrate (Alembic), load the table model and run a single migration if required
         self.migrate = Migrate(self.app, self.db)
         with self.app.app_context():
             if not os.path.exists('migrations'):
-                self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder and running first auto-migration.")
+                self.logger.warning("Initial setup, no migrations folder found. Initializing new migrations folder.")
                 init()
             migrate(message="auto-migration")
-            upgrade() 
-        self.create_engine()
+            upgrade()
 
     def create_engine(self):
         """Create a SQLAlchemy engine to handle low-level data operations (IUD)"""
@@ -91,7 +91,7 @@ class MySQLDatastore:
         Returns:
             SQLALCHEMY_DATABASE_URI(str): A formatted SQLAlchemy database URI.
         """
-        SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
+        SQLALCHEMY_DATABASE_URI = "mysql+pymysql://{username}:{password}@{hostname}/{databasename}".format(
             username=mysql_config_params['mysql_username'],
             password=mysql_config_params['mysql_password'],
             hostname=mysql_config_params['mysql_hostname'],
@@ -112,13 +112,12 @@ class MySQLDatastore:
                                   configuration information. Essentially controls the schema of the database table and ORM,
         
         Returns:
-            A SQLAlchemy db.Model class object
+            A SQLAlchemy db.Model class object 
         """
         # Define the default table schema with ID and timestamp fields
         attributes = {
             "__tablename__": config_filename.split('.')[0].lower(),
-            "__table_args__": {'extend_existing': True},
-            "id": Column(Integer, primary_key=True), 
+            "__table_args__": {'extend_existing': True, 'schema': self.table_schema},
         }
         attributes['id'] = Column(String(255), nullable=False, primary_key=True)
         attributes['timestamp'] = Column(DateTime, nullable=False, primary_key=False)
