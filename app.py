@@ -237,11 +237,7 @@ def dashboard():
     Returns:
         None
     """
-    df = datastore.read_data()
-    formatting_options = {
-        'classes': ['table','table-striped', 'table-bordered'],
-        'index': False
-    }
+    
     if request.method == 'POST':       
         data = request.get_json()
         target_format = data.get('format') 
@@ -261,29 +257,42 @@ def dashboard():
                 }
             }
         )
-        submissionTimeTrend_labels = [x.strftime("%m-%d-%y") for x in submissionTimeTrend_result['group'].to_list()]
+        submissionTimeTrend_labels = [x.strftime("%m-%d-%y") for x in submissionTimeTrend_result['grouping'].to_list()]
         submissionTimeTrend_data = submissionTimeTrend_result['aggregation'].to_list()
 
         # Query aggregated data for submission time trend
-        breakdown_field = 'import_export'
+        breakdown_field = config['dashboard'].get('breakdown_visualization_field', 'id')
         categoryDonut_1_result = datastore.read_aggregated_data(
             group_by_field=breakdown_field,
             aggregation_function='count',
             aggregation_field='id'
         )
-        categoryDonut_1_labels = categoryDonut_1_result['group'].to_list()
-        categoryDonut_1_data = categoryDonut_1_result['aggregation'].to_list()
-        categoryDonut_1_title = f"Breakdown by {breakdown_field}"
+        if categoryDonut_1_result.empty:
+            categoryDonut_1_labels = []
+            categoryDonut_1_data = []
+            categoryDonut_1_title = f"Breakdown by {breakdown_field}? (invalid)"
+            app_logger.critical("some warning")
+        else:
+            categoryDonut_1_labels = categoryDonut_1_result['grouping'].to_list()
+            categoryDonut_1_data = categoryDonut_1_result['aggregation'].to_list()
+            categoryDonut_1_title = f"Breakdown by {breakdown_field}"
+            
+        # Prepare submission data and rendering options
+        formatting_options = {
+            'classes': ['table','table-striped', 'table-bordered'],
+            'index': False
+        }
+        df = datastore.read_data()
 
-    return render_template(
-        'dashboard.html',
-        form_submissions=df.to_html(**formatting_options),
-        submissionTimeTrend_labels=submissionTimeTrend_labels,
-        submissionTimeTrend_data=submissionTimeTrend_data,
-        categoryDonut_1_labels=categoryDonut_1_labels,
-        categoryDonut_1_data=categoryDonut_1_data,
-        categoryDonut_1_title=categoryDonut_1_title
-    )
+        return render_template(
+            'dashboard.html',
+            form_submissions=df.to_html(**formatting_options),
+            submissionTimeTrend_labels=submissionTimeTrend_labels,
+            submissionTimeTrend_data=submissionTimeTrend_data,
+            categoryDonut_1_labels=categoryDonut_1_labels,
+            categoryDonut_1_data=categoryDonut_1_data,
+            categoryDonut_1_title=categoryDonut_1_title
+        )
 
 @app.route("/upload", methods=["GET", "POST"])
 @login_required

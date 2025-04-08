@@ -132,10 +132,15 @@
             return colors;
         }
 
+        function sanitize_data_json_safe(data){
+            var sanitized_data = data.replace('None','\'None\'').replace(/'/g, '"');
+            return JSON.parse(sanitized_data)
+        }
+
         // Submission trend over time
         const submissionTimeTrend_Ctx = document.getElementById('submissionTimeTrend');
-        var submissionTimeTrend_labels = JSON.parse("{{ submissionTimeTrend_labels | safe }}".replace(/'/g, '"'));
-        var submissionTimeTrend_data = JSON.parse("{{ submissionTimeTrend_data | safe }}".replace(/'/g, '"'));
+        var submissionTimeTrend_labels = sanitize_data_json_safe("{{ submissionTimeTrend_labels | safe}}");
+        var submissionTimeTrend_data = sanitize_data_json_safe("{{ submissionTimeTrend_data | safe }}");
         new Chart(submissionTimeTrend_Ctx, {
           type: 'line',
           data: {
@@ -149,7 +154,7 @@
           options: {
             scales: {
               y: {
-                beginAtZero: true
+                beginAtZero: true,
               }
             },
             plugins: {
@@ -163,8 +168,8 @@
 
         // 2. Donut
         const categoryDonut_1_Ctx = document.getElementById('categoryDonut_1');
-        var categoryDonut_1_labels = JSON.parse("{{ categoryDonut_1_labels | safe }}".replace(/'/g, '"'));
-        var categoryDonut_1_data = JSON.parse("{{ categoryDonut_1_data | safe }}".replace(/'/g, '"'));
+        var categoryDonut_1_labels = sanitize_data_json_safe("{{ categoryDonut_1_labels | safe }}");
+        var categoryDonut_1_data = sanitize_data_json_safe("{{ categoryDonut_1_data | safe }}");
         const start_rgb =  'rgb(180, 216, 255)';
         const end_rgb =  'rgb(0, 91, 187)';
         const gradient_bgcolors = generateGradientColors(categoryDonut_1_labels, start_rgb, end_rgb);

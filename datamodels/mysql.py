@@ -55,7 +55,6 @@ class MySQLDatastore:
         self.table_name = self.config['form']['form_config_file_name'].split('.')[0]
         self.table_schema = self.config['datastore']['datastore_params']['mysql_database'] # Not a typo - MySQL does not have "schemas"
         self.logger = LoggerManager.get_logger()
-
         # Set up MYSQL and initialize the SQLAlchemy ORM engine
         mysql_config_params = self.config['datastore']['datastore_params']
         self.sqlalchemy_database_uri = self.generate_database_uri_from_config(mysql_config_params=mysql_config_params)
@@ -256,23 +255,28 @@ class MySQLDatastore:
         }
 
         # Validate parameters against data model
+        print(f"logger: {self.logger}")
+        print(f"logger name: {self.logger.name}")
+        print(f"handlers: {self.logger.handlers}")
+        print("Will log critical now")
+        self.logger.critical("THIS IS A CRITICAL LOG FROM XYZ")
+        print("Did log critical")
         try:
             getattr(self.table_model, group_by_field)
-        except AttributeError:
-            self.logger.warning(f"An invalid group_by_field, '{group_by_field}', was specified; an empty dataframe will be returned.")
+        except (AttributeError, KeyError) as e:
+            self.logger.warning(f"An invalid group_by_field, '{group_by_field}', was specified {e}; an empty dataframe will be returned.")
             return pd.DataFrame()
         if aggregation_function not in aggregation_function_map:
             self.logger.warning(f"An invalid aggregation_function value, '{aggregation_function}', was specified; an empty dataframe will be returned.")
             return pd.DataFrame()
         try:
             getattr(self.table_model, aggregation_field)
-        except AttributeError:
+        except (AttributeError, KeyError):
             self.logger.warning(f"An invalid aggregation_field, '{aggregation_field}', was specified; an empty dataframe will be returned.")
             return pd.DataFrame()
-       
+
         # Perform the aggregation query against the table
         with Session(self.engine) as session:
-            
             if field_options:
                 # Handle any field options eg. CASTs
                 if 'CAST' in field_options:
@@ -294,7 +298,7 @@ class MySQLDatastore:
             # Define and execute the query
             aggregation_function = aggregation_function_map[aggregation_function]
             aggregation_query = session.query(
-                group_by_field.label("group"), 
+                group_by_field.label("grouping"), 
                 aggregation_function(aggregation_field).label("aggregation")
             ).group_by(group_by_field)                            
             df = pd.read_sql(aggregation_query.statement, con=self.engine)

@@ -47,7 +47,7 @@ class LoggerManager(BaseLoggerManager):
 
             This is a singleton classmethod - do not instantiate this class as an object.
         """
-        
+        print(f"LoggerManager used from file: {__file__}")
         if not cls._logger_instance and config:
             logging_dictConfig = config['system']['logging']
             cls.logger_name = next(iter(logging_dictConfig['loggers'].keys()))
