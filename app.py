@@ -16,7 +16,7 @@ import glob
 # Read instance config YAML and form schema
 config = read_instance_config(config_folder='config', config_file_name='config.yaml')
 form_schema = generate_schema_from_config_file(config_folder=os.path.join('config',config['form']['form_config_folder']),config_filename=config['form']['form_config_file_name'])
-
+        
 # Initialize logging
 app_logger = LoggerManager.get_logger(config)
 
@@ -245,6 +245,9 @@ def dashboard():
             # Key "format" exists, download datastore as file
             return download_datastore_in_specific_format(datastore=datastore, target_format=target_format)
     elif request.method == 'GET':
+        # Prevent log suppression in request.method-serving Werkzeug thread 
+        app_logger.disabled = False 
+
         # Query aggregated data for submission time trend
         submissionTimeTrend_result = datastore.read_aggregated_data(
             group_by_field='timestamp',
@@ -271,7 +274,6 @@ def dashboard():
             categoryDonut_1_labels = []
             categoryDonut_1_data = []
             categoryDonut_1_title = f"Breakdown by {breakdown_field}? (invalid)"
-            app_logger.critical("some warning")
         else:
             categoryDonut_1_labels = categoryDonut_1_result['grouping'].to_list()
             categoryDonut_1_data = categoryDonut_1_result['aggregation'].to_list()

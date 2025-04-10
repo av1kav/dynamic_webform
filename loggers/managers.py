@@ -39,15 +39,23 @@ class LoggerManager(BaseLoggerManager):
     def get_logger(cls, config=None):
         """
         Return a singleton logger instance if configured, otherwise configure a new logger 
-        and handlers based on the provided config and return it.
+        and handlers based on the provided config and return it. Ensure that the logger is not
+        disabled when handling request-based function calls (eg. request.method)
 
         Args:
             config(dict): (Optional, default=None) An optional kwarg which should be supplied
             the instance configuration dict only once - when first setting up the LoggerManager.
 
             This is a singleton classmethod - do not instantiate this class as an object.
+        
+        Returns:
+            A singleton logger, equivalent to (logging.getLogger(cls.logger_name))
+
+        Usage:
+            >>> app_logger = LoggerManager.get_logger(config) # Provide the config arg when setting up a singleton logger
+            >>> app_logger.info("message") # An example of an INFO log
         """
-        print(f"LoggerManager used from file: {__file__}")
+        # Initial logic to set up logger
         if not cls._logger_instance and config:
             logging_dictConfig = config['system']['logging']
             cls.logger_name = next(iter(logging_dictConfig['loggers'].keys()))
@@ -60,4 +68,3 @@ class LoggerManager(BaseLoggerManager):
             for name, logger in logging.root.manager.loggerDict.items():
                 cls._logger_instance.debug(f"Logger: {name}, Level: {getattr(logger, 'level', 'Not Set')}")
         return cls._logger_instance
-

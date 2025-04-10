@@ -254,25 +254,18 @@ class MySQLDatastore:
             "max": func.max
         }
 
-        # Validate parameters against data model
-        print(f"logger: {self.logger}")
-        print(f"logger name: {self.logger.name}")
-        print(f"handlers: {self.logger.handlers}")
-        print("Will log critical now")
-        self.logger.critical("THIS IS A CRITICAL LOG FROM XYZ")
-        print("Did log critical")
         try:
             getattr(self.table_model, group_by_field)
         except (AttributeError, KeyError) as e:
-            self.logger.warning(f"An invalid group_by_field, '{group_by_field}', was specified {e}; an empty dataframe will be returned.")
+            self.logger.error(f"An invalid group_by_field, '{group_by_field}', was specified; an empty dataframe will be returned.")
             return pd.DataFrame()
         if aggregation_function not in aggregation_function_map:
-            self.logger.warning(f"An invalid aggregation_function value, '{aggregation_function}', was specified; an empty dataframe will be returned.")
+            self.logger.error(f"An invalid aggregation_function value, '{aggregation_function}', was specified; an empty dataframe will be returned.")
             return pd.DataFrame()
         try:
             getattr(self.table_model, aggregation_field)
         except (AttributeError, KeyError):
-            self.logger.warning(f"An invalid aggregation_field, '{aggregation_field}', was specified; an empty dataframe will be returned.")
+            self.logger.error(f"An invalid aggregation_field, '{aggregation_field}', was specified; an empty dataframe will be returned.")
             return pd.DataFrame()
 
         # Perform the aggregation query against the table
@@ -283,7 +276,7 @@ class MySQLDatastore:
                     target_field = field_options['CAST'].get('target_field')
                     target_type = field_options['CAST'].get('target_type')
                     if not target_field or not target_type or target_field not in [group_by_field, aggregation_field]:
-                        self.logger.warning("Invalid CAST options were specified for an aggregation query; they will be ignored.")
+                        self.logger.error("Invalid CAST options were specified for an aggregation query; they will be ignored.")
                         return pd.DataFrame()
                     else:
                         if target_type == 'date':
