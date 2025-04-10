@@ -273,7 +273,7 @@ def dashboard():
         if categoryDonut_1_result.empty:
             categoryDonut_1_labels = []
             categoryDonut_1_data = []
-            categoryDonut_1_title = f"Breakdown by {breakdown_field}? (invalid)"
+            categoryDonut_1_title = f"Breakdown by {breakdown_field} (invalid/empty)"
         else:
             categoryDonut_1_labels = categoryDonut_1_result['grouping'].to_list()
             categoryDonut_1_data = categoryDonut_1_result['aggregation'].to_list()
